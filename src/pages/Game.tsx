@@ -7,7 +7,7 @@ import EspecialEvent from "../components/EspecialEvent";
 
 // no debe de recargar la pagina
 export default function Game() {
-  const sessionData = JSON.parse(sessionStorage.getItem('players') || "[]");
+  let sessionData = JSON.parse(sessionStorage.getItem('players') || "[]");
   const navigator = useNavigate();
   if (!sessionData) {
     navigator('/')
@@ -20,10 +20,11 @@ export default function Game() {
   const [dayCount, setDayCount] = useState(1);
   const [commonEvents, setCommonEvents] = useState<Array<genericEvent>>();
   const [specialEvents, setSpecialEvents] = useState<Array<genericEvent>>();
+
   const [showSpecial, setShowSpecial] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
   useEffect(() => {
-    // let eventos = obtenerEventos(players);
     let eventos = useGetEvents(dayCount, players);
 
     let common: Array<genericEvent> = [];
@@ -39,40 +40,42 @@ export default function Game() {
     console.log(special);
 
     // actualizar sessionStorage
-    // mostrar eventos comunes primero
-    // mostrar eventos especiales
-    if (dayCount > 1) {
-      setShowSpecial(prev => !prev);
-    }
-    setDayCount(prev => prev += 1)
-  }, [])
+  }, [dayCount])
 
   return (
     <div>
-      {showSpecial ? (
-        <main>
+      {!showSpecial ? (
+        <>
+          <h3>Eventos comunes</h3>
           {commonEvents ? (
-            <>
+            <main>
               <ComunEvents day={dayCount} isDay={true} events={commonEvents} />
-            </>
+              <button onClick={() => { setShowSpecial(prev => !prev) }}>Continue</button>
+            </main>
           ) : (
             <>
               <h2>No hay eventos Comunes</h2>
             </>
           )}
-        </main>
+        </>
       ) : (
-        <main>
-          {specialEvents ? (
+        <>{showSummary ? (
+          <>
+            <h1>Resumen</h1>
+            <button onClick={() => { setDayCount(prev => prev += 1); setShowSummary(false); setShowSpecial(false); }}>Siguiente dia</button>
+          </>
+        ) : (
+          <>{specialEvents ? (
             <>
-              <EspecialEvent />
+              <h2>Eventos especial</h2>
+              <EspecialEvent events={specialEvents} whenFinish={() => { setShowSummary(prev => !prev); }} />
             </>
           ) : (
             <>
               <h2>No hay eventos especiales</h2>
             </>
-          )}
-        </main>
+          )}</>
+        )}</>
       )}
     </div>
   )
