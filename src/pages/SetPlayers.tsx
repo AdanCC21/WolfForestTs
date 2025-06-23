@@ -1,11 +1,11 @@
 import { useState } from "react"
-import { newPlayer } from "../entities/player.entity";
+import { newPlayer, Player } from "../entities/player.entity";
 import { useNavigate } from "react-router-dom";
 import { useValidatePlayers } from "../hooks/validate";
 import { response } from "../entities/result.entity";
 
 export default function SetPlayers() {
-    const [players, setPlayers] = useState<Array<newPlayer>>([{ image: '', name: 'Player 1' }]);
+    const [players, setPlayers] = useState<Array<newPlayer>>([{ id: 1, image: '', name: 'Player 1' }]);
     const [alert, setAlert] = useState<string>('');
     const navigator = useNavigate();
 
@@ -14,22 +14,41 @@ export default function SetPlayers() {
             setAlert('Maximo de jugadores excedido');
         }
         let temp: newPlayer = {
+            id: players.length + 1,
             image: '',
             name: `Player ${players.length + 1}`
         }
-        setPlayers(prev => { return { ...prev, temp } });
+        setPlayers(prev => { return [...prev, temp] });
     }
 
     const play = () => {
         let playersOk: response = useValidatePlayers(players);
         if (playersOk.result) {
-            
-            sessionStorage.setItem('players', JSON.stringify(players));
+            let playersList = players.map((current) => {
+                return new Player(current.id, current.name, current.image)
+            })
+            sessionStorage.setItem('players', JSON.stringify(playersList));
             navigator('/game');
         } else {
             setAlert(playersOk.message);
         }
     }
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>, currentPlayer: newPlayer) => {
+        const { value, name } = e.target;
+
+        const updatedPlayer = {
+            ...currentPlayer,
+            [name]: value,
+        };
+
+        const updatedPlayers = players.map((player) =>
+            player.id === currentPlayer.id ? updatedPlayer : player
+        );
+
+        setPlayers(updatedPlayers);
+    };
+
 
     return (
         <>
@@ -42,11 +61,13 @@ export default function SetPlayers() {
             <main>
                 <section>
                     {players.map((current) => (
-                        <article key={current.name}>
-                            <img src={current.image} alt={current.name} />
+                        <article key={current.id}>
+                            <img src={current.image || 'w'} alt={current.name} />
                             <div>
-                                <input placeholder="Image Url" value={current.image} name="image" />
-                                <input placeholder="Image Url" value={current.name} name="name" />
+                                <input placeholder="Image Url" value={current.image} name="image"
+                                    onChange={(e) => { handleChange(e, current) }} />
+                                <input placeholder="Image Url" value={current.name} name="name"
+                                    onChange={(e) => { handleChange(e, current) }} />
                             </div>
                         </article>
                     ))}

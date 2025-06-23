@@ -12,12 +12,11 @@ export default function Game() {
   }
 
   const players: Array<Player> = JSON.parse(sessionData);
+  console.log(players);
 
   const [dayCount, setDayCount] = useState(1);
 
   useEffect(() => {
-
-
     // let eventos = obtenerEventos(players);
     // let eventosComunes = eventos.comunes === true
     // let eventosEspeciales = eventos.comunes === false
@@ -25,13 +24,11 @@ export default function Game() {
     // mostrar eventos comunes primero
     // mostrar eventos especiales
     // rerol
-
-
   }, [dayCount])
 
   return (
     <div>
-
+      Game
     </div>
   )
 }

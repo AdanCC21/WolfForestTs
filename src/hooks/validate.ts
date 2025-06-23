@@ -4,13 +4,14 @@ import { response } from "../entities/result.entity";
 export function useValidatePlayers(players: Array<newPlayer>): response {
     let message = ''
     try {
-        for (let i of players) {
-            for (let j of players) {
-                if (i.name === j.name) {
-                    message = 'Hay 2 usuarios con el mismo nombre de: ' + i.name + '. Porfavor evita nombres duplicados'
-                    throw new Error(message);
-                }
+        const nombres = new Set<string>();
+
+        for (let player of players) {
+            if (nombres.has(player.name)) {
+                message = `Hay 2 usuarios con el mismo nombre: ${player.name}. Por favor evita nombres duplicados.`;
+                throw new Error(message);
             }
+            nombres.add(player.name);
         }
         if (players.length >= 50) {
             message = 'Maximo de jugadores excedido. Maximo de jugadores 50'
