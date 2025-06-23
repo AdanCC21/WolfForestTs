@@ -6,15 +6,16 @@ import ComunEvents from "../components/ComunEvents";
 import EspecialEvent from "../components/EspecialEvent";
 
 // no debe de recargar la pagina
+// Hacer que cargue los jugadores desde aqui, osea crear los objeto PLAYER desde aqui y no desde el set, solo recibir nombre e imagen
 export default function Game() {
   let sessionData = JSON.parse(sessionStorage.getItem('players') || "[]");
   const navigator = useNavigate();
-  if (!sessionData) {
-    navigator('/')
-    return
+  if (sessionData.length === 0) {
+    navigator(`/error/no-se-encontraron-jugadores`)
   }
 
-  const players: Player[] = sessionData.map((obj: any) => Object.assign(new Player(), obj));
+  const players: Player[] = sessionData.map((obj: any) => Player.fromJSON(obj));
+  console.log('---- jugadores -----')
   console.log(players);
 
   const [dayCount, setDayCount] = useState(1);
@@ -35,11 +36,24 @@ export default function Game() {
         : special.push(current);
     })
     setCommonEvents(common);
+    console.log('---- eventos -----')
+    console.log('common');
     console.log(common);
+
     setSpecialEvents(special);
+    console.log('special')
     console.log(special);
 
     // actualizar sessionStorage
+    let playerList = [...common, ...special]
+      .map((item => item.player))
+      .sort((a, b) => a.id - b.id);
+    let temp = JSON.stringify(playerList);
+    console.log('------ player temp -------');
+    console.log(playerList);
+
+    sessionStorage.setItem('players', temp);
+
   }, [dayCount])
 
   return (
@@ -49,7 +63,7 @@ export default function Game() {
           <h3>Eventos comunes</h3>
           {commonEvents ? (
             <main>
-              <ComunEvents day={dayCount} isDay={true} events={commonEvents} />
+              <ComunEvents day={dayCount} events={commonEvents} />
               <button onClick={() => { setShowSpecial(prev => !prev) }}>Continue</button>
             </main>
           ) : (

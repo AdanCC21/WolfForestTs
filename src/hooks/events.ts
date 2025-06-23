@@ -114,10 +114,10 @@ function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Pl
 // Matar a un jugador por un evento natural
 function playerDeath(playerBase: Player) {
     // seleccionar un mensaje random
-    const message = 'murio por pendejo';
+    const message = `${playerBase.name} murio por pendejo`;
 
     // cambiar estado del jugador
-    playerBase.Death;
+    playerBase.Death();
 
     // retornar mensaje y jugador
     return { message: message, player: playerBase, isCommon: false }

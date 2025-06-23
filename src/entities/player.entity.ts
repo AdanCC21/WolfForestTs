@@ -44,18 +44,24 @@ export class Player {
         this.vida += amount;
     }
 
-    public  Revive() {
+    public Revive() {
         this.live = true;
         this.vida = 20;
         this.fuerza = 20;
         this.suerte = 20;
     }
 
-    public  SetFriend(friend: Player): void {
+    public SetFriend(friend: Player): void {
         this.amigo = friend;
     }
 
     public SetRelation(player: Player): void {
         this.pareja = player;
+    }
+
+    static fromJSON(json: any): Player {
+        const player = new Player();
+        Object.assign(player, json);
+        return player;
     }
 }

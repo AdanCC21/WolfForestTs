@@ -69,6 +69,7 @@ export default function SetPlayers() {
                                 <input placeholder="Image Url" value={current.name} name="name"
                                     onChange={(e) => { handleChange(e, current) }} />
                             </div>
+                            <button>Delete</button>
                         </article>
                     ))}
                     <button onClick={() => { addPlayer() }}>+ Add Player</button>
