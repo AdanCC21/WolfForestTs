@@ -4,6 +4,11 @@ function randomNumber(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+export type genericEvent = {
+    message: string,
+    player: Player,
+    isCommon: boolean
+}
 // 0 >= playerProb < eventProb
 const dayEventsList = {
     //0 -> 19
@@ -99,14 +104,11 @@ function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Pl
         return heal(currentPlayer);
     }
 
-    if (luckEvent < eventsList.revive) {
-        // si no esta muerto lo cura
-        if (!currentPlayer.live) {
-            return heal(currentPlayer)
-        } else {
-            return revivePlayer(currentPlayer);
-        }
-
+    // si no esta muerto lo cura
+    if (!currentPlayer.live) {
+        return heal(currentPlayer)
+    } else {
+        return revivePlayer(currentPlayer);
     }
 }
 // Matar a un jugador por un evento natural
@@ -115,10 +117,10 @@ function playerDeath(playerBase: Player) {
     const message = 'murio por pendejo';
 
     // cambiar estado del jugador
-    playerBase.Death();
+    playerBase.Death;
 
     // retornar mensaje y jugador
-    return { message: message, player: playerBase }
+    return { message: message, player: playerBase, isCommon: false }
 }
 
 function linkPlayers(playerBase: Player, playersList: Array<Player>, isDuo: boolean) {
@@ -128,15 +130,15 @@ function linkPlayers(playerBase: Player, playersList: Array<Player>, isDuo: bool
     let otherPlayer = playersOk[Math.floor(Math.random() * playersOk.length)];
     // actualizar datos
     if (isDuo) {
-        otherPlayer.setFriend(playerBase);
-        playerBase.setFriend(otherPlayer);
+        otherPlayer.SetFriend(playerBase);
+        playerBase.SetFriend(otherPlayer);
     } else {
-        otherPlayer.setRelation(playerBase);
-        playerBase.setRelation(otherPlayer);
+        otherPlayer.SetRelation(playerBase);
+        playerBase.SetRelation(otherPlayer);
     }
     // Obtener mensajes
     const message = `${playerBase.name} Se unio con ${otherPlayer.name}`;
-    return { message: message, player: playerBase, otherPlayer: otherPlayer }
+    return { message: message, player: playerBase, isCommon: false }
 }
 function farmCasual(playerBase: Player) {
     // Dependiendo la suerte del jugador obtener un evento que puede
@@ -172,19 +174,19 @@ function farmCasual(playerBase: Player) {
     const randomNum = Math.floor(Math.random() * casualEvent.good);
 
     const message = 'evento casual';
-    return { message: message, player: playerBase }
+    return { message: message, player: playerBase, isCommon: true }
 }
 
 function farmWeapon(playerBase: Player, playersList: Array<Player>) {
     // puede craftear armas casuales, como robarlas
     const message = `${playerBase.name} obtuvo un arma casual`;
-    return { message: message, playerBase: playerBase };
+    return { message: message, player: playerBase, isCommon: true }
 }
 
 function farmBigWeapon(playerBase: Player, playersList: Array<Player>) {
     // puede craftear armas casuales, como robarlas
     const message = `${playerBase.name} obtuvo un arma grande`;
-    return { message: message, playerBase: playerBase };
+    return { message: message, player: playerBase, isCommon: true }
 }
 
 function heal(playerBase: Player) {
@@ -193,15 +195,15 @@ function heal(playerBase: Player) {
 
     // obtener mensaje
     const message = `${playerBase.name} se curo ${healAmount} puntos de vida con`;
-    playerBase.heal(healAmount);
+    playerBase.Heal(healAmount);
 
-    return { message: message, player: playerBase }
+    return { message: message, player: playerBase, isCommon: true }
 }
 
 function revivePlayer(playerBase: Player) {
     // actualizar info
-    playerBase.revive();
+    playerBase.Revive();
     // obtener mensaje
     const message = `${playerBase.name} SE PARO SE PARO SE PARO`;
-    return { message: message, player: playerBase }
+    return { message: message, player: playerBase, isCommon: false }
 }

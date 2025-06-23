@@ -1,9 +1,9 @@
-import { comunEvent } from "../entities/events.entity"
+import { genericEvent } from "../hooks/events"
 
 type Prompts = {
   day: number,
   isDay: boolean,
-  events: Array<comunEvent>
+  events: Array<genericEvent>
 }
 
 export default function ComunEvents({ day, isDay, events }: Prompts) {
@@ -17,7 +17,7 @@ export default function ComunEvents({ day, isDay, events }: Prompts) {
           {events.map((current) => (
             <article>
               <img src={current.player.image} alt={current.player.name} />
-              <p>{current.player.name}</p>
+              <p>{current.message}</p>
             </article>
           ))}
         </section>

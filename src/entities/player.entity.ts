@@ -35,27 +35,27 @@ export class Player {
         this.pareja = pareja;
     }
 
-    Death(): void {
+    public Death(): void {
         this.vida = 0;
         this.live = false;
     }
 
-    heal(amount: number): void {
+    public Heal(amount: number): void {
         this.vida += amount;
     }
 
-    revive() {
+    public  Revive() {
         this.live = true;
         this.vida = 20;
         this.fuerza = 20;
         this.suerte = 20;
     }
 
-    setFriend(friend: Player): void {
+    public  SetFriend(friend: Player): void {
         this.amigo = friend;
     }
 
-    setRelation(player: Player): void {
+    public SetRelation(player: Player): void {
         this.pareja = player;
     }
 }
