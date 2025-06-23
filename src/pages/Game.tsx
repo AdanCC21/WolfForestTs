@@ -16,20 +16,17 @@ export default function Game() {
   const [dayCount, setDayCount] = useState(1);
 
   useEffect(() => {
-    // dia
-    if (dayCount % 2 === 0) {
-      // let eventos = obtenerEventos(players);
-      // let eventosComunes = eventos.comunes === true
-      // let eventosEspeciales = eventos.comunes === false
-      // actualizar sessionStorage
-      // mostrar eventos comunes primero
-      // mostrar eventos especiales
-      // rerol
-    }
-    else // noche
-    {
 
-    }
+
+    // let eventos = obtenerEventos(players);
+    // let eventosComunes = eventos.comunes === true
+    // let eventosEspeciales = eventos.comunes === false
+    // actualizar sessionStorage
+    // mostrar eventos comunes primero
+    // mostrar eventos especiales
+    // rerol
+
+
   }, [dayCount])
 
   return (
