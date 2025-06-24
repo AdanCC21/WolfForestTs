@@ -71,44 +71,34 @@ export function useGetEvents(dayNumber: number, playersList: Array<Player>) {
 // lista de eventos
 function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Player>) {
     let luckEvent = randomNumber(0, 100);
+    if (currentPlayer.live) {
+        if (luckEvent < eventsList.death) return playerDeath(currentPlayer);
 
-    if (luckEvent < eventsList.death) {
-        return playerDeath(currentPlayer);
-    }
+        if (luckEvent < eventsList.deal) return linkPlayers(currentPlayer, playersList, true);
 
-    if (luckEvent < eventsList.deal) {
-        return linkPlayers(currentPlayer, playersList, true);
-    }
+        if (luckEvent < eventsList.relation) return linkPlayers(currentPlayer, playersList, false);
 
-    if (luckEvent < eventsList.relation) {
-        return linkPlayers(currentPlayer, playersList, false);
-    }
+        if (luckEvent < eventsList.farmCasual) return farmCasual(currentPlayer);
 
-    if (luckEvent < eventsList.farmCasual) {
-        // cualquier evento de farmeo casual (comida, refugio etc)
-        return farmCasual(currentPlayer);
-    }
+        if (luckEvent < eventsList.farmWeapon) return farmWeapon(currentPlayer, playersList);
 
-    if (luckEvent < eventsList.farmWeapon) {
-        // cualquier evento para obtener un arma, o crearla
-        return farmWeapon(currentPlayer, playersList);
-    }
-    if (luckEvent < eventsList.farmBigWeapon) {
-        // obtener un arma de nivel militar (solo si su fuerza y astucia lo permiten)
-        return farmBigWeapon(currentPlayer, playersList);
-    }
+        if (luckEvent < eventsList.farmBigWeapon) return farmBigWeapon(currentPlayer, playersList);
 
-    if (luckEvent < eventsList.heal) {
-        // curar sus heridas o las de su duo o pareja
-        // solo si alguno de estos tiene puntos de vida son menores al default
-        return heal(currentPlayer);
+        if (luckEvent < eventsList.heal) {
+            return heal(currentPlayer);
+        } else {
+            return heal(currentPlayer);
+        }
     }
-
     // si no esta muerto lo cura
-    if (!currentPlayer.live) {
-        return heal(currentPlayer)
+    if (luckEvent >= eventsList.heal) {
+        if (!currentPlayer.live) {
+            return heal(currentPlayer)
+        } else {
+            return revivePlayer(currentPlayer);
+        }
     } else {
-        return revivePlayer(currentPlayer);
+        return { message: "death", player: new Player(), isCommon: true };
     }
 }
 // Matar a un jugador por un evento natural

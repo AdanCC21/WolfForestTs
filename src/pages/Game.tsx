@@ -7,14 +7,23 @@ import EspecialEvent from "../components/EspecialEvent";
 
 // no debe de recargar la pagina
 // Hacer que cargue los jugadores desde aqui, osea crear los objeto PLAYER desde aqui y no desde el set, solo recibir nombre e imagen
+let players: Player[] = [];
 export default function Game() {
-  let sessionData = JSON.parse(sessionStorage.getItem('players') || "[]");
   const navigator = useNavigate();
-  if (sessionData.length === 0) {
-    navigator(`/error/no-se-encontraron-jugadores`)
-  }
 
-  const players: Player[] = sessionData.map((obj: any) => Player.fromJSON(obj));
+  useEffect(() => {
+    let sessionData = JSON.parse(sessionStorage.getItem('players') || "[]");
+    if (sessionData.length === 0) {
+      navigator(`/error/no-se-encontraron-jugadores`)
+    }
+
+    players = sessionData.map((current: any) => {
+      return new Player(current.id, current.name, current.image);
+    });
+
+    console.log("Entro aqui")
+  }, [])
+
   console.log('---- jugadores -----')
   console.log(players);
 
@@ -48,11 +57,13 @@ export default function Game() {
     let playerList = [...common, ...special]
       .map((item => item.player))
       .sort((a, b) => a.id - b.id);
-    let temp = JSON.stringify(playerList);
-    console.log('------ player temp -------');
-    console.log(playerList);
-
-    sessionStorage.setItem('players', temp);
+    players = [...playerList];
+    console.log('--- aquiiii -----')
+    console.log(players)
+    // let temp = JSON.stringify(playerList);
+    // console.log('------ player temp -------');
+    // console.log(playerList);
+    // sessionStorage.setItem('players', temp);
 
   }, [dayCount])
 
@@ -62,32 +73,33 @@ export default function Game() {
         <>
           <h3>Eventos comunes</h3>
           {commonEvents ? (
-            <main>
+            <section>
               <ComunEvents day={dayCount} events={commonEvents} />
               <button onClick={() => { setShowSpecial(prev => !prev) }}>Continue</button>
-            </main>
+            </section>
           ) : (
-            <>
+            <section>
               <h2>No hay eventos Comunes</h2>
-            </>
+            </section>
           )}
         </>
       ) : (
         <>{showSummary ? (
-          <>
+          <section>
             <h1>Resumen</h1>
+            { }
             <button onClick={() => { setDayCount(prev => prev += 1); setShowSummary(false); setShowSpecial(false); }}>Siguiente dia</button>
-          </>
+          </section>
         ) : (
           <>{specialEvents ? (
-            <>
+            <section>
               <h2>Eventos especial</h2>
               <EspecialEvent events={specialEvents} whenFinish={() => { setShowSummary(prev => !prev); }} />
-            </>
+            </section>
           ) : (
-            <>
+            <section>
               <h2>No hay eventos especiales</h2>
-            </>
+            </section>
           )}</>
         )}</>
       )}

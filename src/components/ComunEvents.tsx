@@ -13,12 +13,16 @@ export default function ComunEvents({ day, events }: Prompts) {
       </div>
 
       <section>
-        {events.map((current, index) => (
-          <article key={index}>
-            <img src={current.player.image} alt={current.player.name} />
-            <p>{current.message}</p>
-          </article>
-        ))}
+        {events.map((current, index) => {
+          if (current.message != 'death') {
+            return (
+              <article key={index}>
+                <img src={current.player.image} alt={current.player.name} />
+                <p>{current.message}</p>
+              </article>
+            )
+          }
+        })}
       </section>
 
     </>

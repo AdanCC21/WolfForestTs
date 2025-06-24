@@ -24,10 +24,7 @@ export default function SetPlayers() {
     const play = () => {
         let playersOk: response = useValidatePlayers(players);
         if (playersOk.result) {
-            let playersList = players.map((current) => {
-                return new Player(current.id, current.name, current.image)
-            })
-            sessionStorage.setItem('players', JSON.stringify(playersList));
+            sessionStorage.setItem('players', JSON.stringify(players));
             navigator('/game');
         } else {
             setAlert(playersOk.message);
