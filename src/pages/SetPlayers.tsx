@@ -1,11 +1,11 @@
 import { useState } from "react"
-import { newPlayer, Player } from "../entities/player.entity";
+import { newPlayer } from "../entities/player.entity";
 import { useNavigate } from "react-router-dom";
 import { useValidatePlayers } from "../hooks/validate";
 import { response } from "../entities/result.entity";
 
 export default function SetPlayers() {
-    const [players, setPlayers] = useState<Array<newPlayer>>([{ id: 1, image: '', name: 'Player 1' }]);
+    const [players, setPlayers] = useState<Array<newPlayer>>([{ id: 1, image: 'https://media1.tenor.com/m/DbkOnZvFb6MAAAAd/glorp-outer-space.gif', name: 'Player 1' }]);
     const [alert, setAlert] = useState<string>('');
     const navigator = useNavigate();
 
@@ -15,7 +15,7 @@ export default function SetPlayers() {
         }
         let temp: newPlayer = {
             id: players.length + 1,
-            image: '',
+            image: 'https://media1.tenor.com/m/DbkOnZvFb6MAAAAd/glorp-outer-space.gif',
             name: `Player ${players.length + 1}`
         }
         setPlayers(prev => { return [...prev, temp] });

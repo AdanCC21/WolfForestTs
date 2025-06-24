@@ -7,22 +7,9 @@ import EspecialEvent from "../components/EspecialEvent";
 
 // no debe de recargar la pagina
 // Hacer que cargue los jugadores desde aqui, osea crear los objeto PLAYER desde aqui y no desde el set, solo recibir nombre e imagen
-let players: Player[] = [];
 export default function Game() {
   const navigator = useNavigate();
-
-  useEffect(() => {
-    let sessionData = JSON.parse(sessionStorage.getItem('players') || "[]");
-    if (sessionData.length === 0) {
-      navigator(`/error/no-se-encontraron-jugadores`)
-    }
-
-    players = sessionData.map((current: any) => {
-      return new Player(current.id, current.name, current.image);
-    });
-
-    console.log("Entro aqui")
-  }, [])
+  const [players, setPlayers] = useState<Player[]>([]);
 
   console.log('---- jugadores -----')
   console.log(players);
@@ -34,8 +21,22 @@ export default function Game() {
   const [showSpecial, setShowSpecial] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
 
-  useEffect(() => {
-    let eventos = useGetEvents(dayCount, players);
+  const loadPlayers = () => {
+    const sessionData = JSON.parse(sessionStorage.getItem('players') || "[]");
+
+    if (sessionData.length === 0) {
+      navigator(`/error/no-se-encontraron-jugadores`);
+      return;
+    }
+
+    const loadedPlayers = sessionData.map((current: any) =>
+      new Player(current.id, current.name, current.image)
+    );
+    return loadedPlayers;
+  }
+
+  const handleEvents = (loadedPlayers: Player[]) => {
+    let eventos = useGetEvents(dayCount, loadedPlayers);
 
     let common: Array<genericEvent> = [];
     let special: Array<genericEvent> = [];
@@ -45,26 +46,24 @@ export default function Game() {
         : special.push(current);
     })
     setCommonEvents(common);
-    console.log('---- eventos -----')
-    console.log('common');
-    console.log(common);
 
     setSpecialEvents(special);
-    console.log('special')
-    console.log(special);
 
-    // actualizar sessionStorage
+    // actualizar array
     let playerList = [...common, ...special]
       .map((item => item.player))
       .sort((a, b) => a.id - b.id);
-    players = [...playerList];
-    console.log('--- aquiiii -----')
-    console.log(players)
-    // let temp = JSON.stringify(playerList);
-    // console.log('------ player temp -------');
-    // console.log(playerList);
-    // sessionStorage.setItem('players', temp);
 
+    setPlayers(playerList);
+  }
+
+  useEffect(() => {
+    if (players.length === 0) {
+      const loadedPlayers = loadPlayers();
+      handleEvents(loadedPlayers);
+    } else {
+      handleEvents(players);
+    }
   }, [dayCount])
 
   return (

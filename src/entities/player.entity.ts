@@ -51,7 +51,7 @@ export class Player {
         this.suerte = 20;
     }
 
-    public SetFriend(friend: Player): void {|
+    public SetFriend(friend: Player): void {
         this.amigo = friend;
     }
 
