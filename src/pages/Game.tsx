@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { genericEvent, useGetEvents } from "../hooks/events";
 import ComunEvents from "../components/ComunEvents";
 import EspecialEvent from "../components/EspecialEvent";
+import SummaryCard from "../components/SummaryCard";
 
 // no debe de recargar la pagina
 // Hacer que cargue los jugadores desde aqui, osea crear los objeto PLAYER desde aqui y no desde el set, solo recibir nombre e imagen
@@ -11,13 +12,11 @@ export default function Game() {
   const navigator = useNavigate();
   const [players, setPlayers] = useState<Player[]>([]);
 
-  console.log('---- jugadores -----')
-  console.log(players);
-
   const [dayCount, setDayCount] = useState(1);
   const [commonEvents, setCommonEvents] = useState<Array<genericEvent>>();
   const [specialEvents, setSpecialEvents] = useState<Array<genericEvent>>();
 
+  const [showCommon, setShowCommon] = useState(true);
   const [showSpecial, setShowSpecial] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
 
@@ -46,8 +45,9 @@ export default function Game() {
         : special.push(current);
     })
     setCommonEvents(common);
-
+    console.log(common);
     setSpecialEvents(special);
+    console.log(special);
 
     // actualizar array
     let playerList = [...common, ...special]
@@ -57,51 +57,103 @@ export default function Game() {
     setPlayers(playerList);
   }
 
+  const playersLiving = () => {
+    const playersLiving: Array<Player> = []
+    players.forEach((current) => { if (current.live) playersLiving.push(current) })
+    return playersLiving;
+  }
+
   useEffect(() => {
     if (players.length === 0) {
+      console.log('cargo');
       const loadedPlayers = loadPlayers();
+      console.log(loadedPlayers);
       handleEvents(loadedPlayers);
     } else {
+      console.log('eventos');
       handleEvents(players);
     }
   }, [dayCount])
 
+  const handleScreens = () => {
+    if (showCommon) {
+      return (
+        <section>
+          {commonEvents ? (
+            <>
+              <ComunEvents day={dayCount} events={commonEvents} />
+              <button onClick={() => { setShowSpecial(true); setShowCommon(false); }}>Continuar</button>
+            </>
+          ) : (
+            <h2>No hay eventos comunes</h2>
+          )}
+        </section>
+      );
+    }
+
+    if (showSpecial) {
+      return (
+        <section>
+          <h2>Evento especial</h2>
+          {specialEvents ? (
+            <EspecialEvent
+              events={specialEvents}
+              whenFinish={() => { setShowSummary(true); setShowSpecial(false); }}
+            />
+          ) : (
+            <p>No hay eventos especiales</p>
+          )}
+        </section>
+      );
+    }
+
+    if (showSummary) {
+      return (
+        <section>
+          <h1>Resumen</h1>
+          {players.map((current) => {
+            console.log(current);
+            return (
+              <SummaryCard player={current} />
+            )
+          })}
+          <button onClick={() => {
+            setShowSummary(false);
+          }}>
+            Siguiente día
+          </button>
+        </section>
+      );
+    }
+
+    // Winner
+    let playersInGame = playersLiving();
+    if (playersInGame.length <= 1) {
+      if (playersInGame.length === 1) {
+        return (
+          <section>
+            <h1>Ganador</h1>
+            <SummaryCard player={playersInGame[0]} />
+          </section>
+        )
+      }
+      else {
+        return (
+          <section>
+            <h1>Todos los jugadores murieron</h1>
+          </section>
+        )
+      }
+    } else {
+      setDayCount(prev => prev + 1);
+      setShowCommon(true);
+    }
+  };
+
+
   return (
     <div>
-      {!showSpecial ? (
-        <>
-          <h3>Eventos comunes</h3>
-          {commonEvents ? (
-            <section>
-              <ComunEvents day={dayCount} events={commonEvents} />
-              <button onClick={() => { setShowSpecial(prev => !prev) }}>Continue</button>
-            </section>
-          ) : (
-            <section>
-              <h2>No hay eventos Comunes</h2>
-            </section>
-          )}
-        </>
-      ) : (
-        <>{showSummary ? (
-          <section>
-            <h1>Resumen</h1>
-            { }
-            <button onClick={() => { setDayCount(prev => prev += 1); setShowSummary(false); setShowSpecial(false); }}>Siguiente dia</button>
-          </section>
-        ) : (
-          <>{specialEvents ? (
-            <section>
-              <h2>Eventos especial</h2>
-              <EspecialEvent events={specialEvents} whenFinish={() => { setShowSummary(prev => !prev); }} />
-            </section>
-          ) : (
-            <section>
-              <h2>No hay eventos especiales</h2>
-            </section>
-          )}</>
-        )}</>
-      )}
-    </div>
+      {handleScreens()}
+    </div >
   )
 }

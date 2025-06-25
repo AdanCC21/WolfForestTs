@@ -115,20 +115,29 @@ function playerDeath(playerBase: Player) {
 
 function linkPlayers(playerBase: Player, playersList: Array<Player>, isDuo: boolean) {
     // filtrar jugadores vivos y que no sean el jugador base
-    let playersOk = playersList.filter(current => current.live && current !== playerBase && !current.amigo)
-    // seleccionar jugador random
-    let otherPlayer = playersOk[Math.floor(Math.random() * playersOk.length)];
-    // actualizar datos
-    if (isDuo) {
-        otherPlayer.SetFriend(playerBase);
-        playerBase.SetFriend(otherPlayer);
+    let playersOk = playersList.filter(current => current.live && current !== playerBase && !current.amigo);
+
+    let otherPlayer: Player | null = null;
+
+    if (playersOk.length > 0) {
+        const randomNumber = Math.floor(Math.random() * playersOk.length);
+        otherPlayer = playersOk[randomNumber];
+
+        if (isDuo) {
+            otherPlayer.SetFriend(playerBase);
+            playerBase.SetFriend(otherPlayer);
+        } else {
+            otherPlayer.SetRelation(playerBase);
+            playerBase.SetRelation(otherPlayer);
+        }
+        // Obtener mensajes
+        const message = `${playerBase.name} Se unio con ${otherPlayer.name}`;
+        return { message: message, player: playerBase, isCommon: false }
     } else {
-        otherPlayer.SetRelation(playerBase);
-        playerBase.SetRelation(otherPlayer);
+        console.warn("No hay jugadores válidos disponibles.");
+        return farmCasual(playerBase);
     }
-    // Obtener mensajes
-    const message = `${playerBase.name} Se unio con ${otherPlayer.name}`;
-    return { message: message, player: playerBase, isCommon: false }
+
 }
 function farmCasual(playerBase: Player) {
     // Dependiendo la suerte del jugador obtener un evento que puede
