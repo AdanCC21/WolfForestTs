@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import { Player } from "../entities/player.entity";
 import { useNavigate } from "react-router-dom";
-import { genericEvent, useGetEvents } from "../hooks/events";
+import { genericEvent } from "../entities/events.entity";
+import { useGetEvents } from "../hooks/events"
 import ComunEvents from "../components/ComunEvents";
 import EspecialEvent from "../components/EspecialEvent";
 import SummaryCard from "../components/SummaryCard";
@@ -45,11 +46,8 @@ export default function Game() {
         : special.push(current);
     })
     setCommonEvents(common);
-    console.log(common);
     setSpecialEvents(special);
-    console.log(special);
 
-    // actualizar array
     let playerList = [...common, ...special]
       .map((item => item.player))
       .sort((a, b) => a.id - b.id);
@@ -65,12 +63,9 @@ export default function Game() {
 
   useEffect(() => {
     if (players.length === 0) {
-      console.log('cargo');
       const loadedPlayers = loadPlayers();
-      console.log(loadedPlayers);
       handleEvents(loadedPlayers);
     } else {
-      console.log('eventos');
       handleEvents(players);
     }
   }, [dayCount])
@@ -85,7 +80,10 @@ export default function Game() {
               <button onClick={() => { setShowSpecial(true); setShowCommon(false); }}>Continuar</button>
             </>
           ) : (
-            <h2>No hay eventos comunes</h2>
+            <>
+              <h2>No hay eventos comunes</h2>
+              <button onClick={() => { setShowSpecial(true); setShowCommon(false); }}>Continuar</button>
+            </>
           )}
         </section>
       );
@@ -95,13 +93,16 @@ export default function Game() {
       return (
         <section>
           <h2>Evento especial</h2>
-          {specialEvents ? (
+          {specialEvents?.length ? (
             <EspecialEvent
               events={specialEvents}
               whenFinish={() => { setShowSummary(true); setShowSpecial(false); }}
             />
           ) : (
-            <p>No hay eventos especiales</p>
+            <>
+              <p>No hay eventos especiales</p>
+              <button onClick={() => { setShowSummary(true); setShowSpecial(false) }}>Continuar</button>
+            </>
           )}
         </section>
       );

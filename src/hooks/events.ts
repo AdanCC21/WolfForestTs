@@ -1,13 +1,7 @@
 import { Player } from "../entities/player.entity";
-
+import { eventType, genericEvent } from "../entities/events.entity";
 function randomNumber(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-export type genericEvent = {
-    message: string,
-    player: Player,
-    isCommon: boolean
 }
 // 0 >= playerProb < eventProb
 const dayEventsList = {
@@ -98,24 +92,20 @@ function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Pl
             return revivePlayer(currentPlayer);
         }
     } else {
-        return { message: "death", player: new Player(), isCommon: true };
+        return { message: "death", player: new Player(), isCommon: true, eventType:eventType.COMMON };
     }
 }
 // Matar a un jugador por un evento natural
-function playerDeath(playerBase: Player) {
-    // seleccionar un mensaje random
-    const message = `${playerBase.name} murio por pendejo`;
-
-    // cambiar estado del jugador
+function playerDeath(playerBase: Player): genericEvent {
+    const message = `${playerBase.name} murió por pendejo`;
     playerBase.Death();
-
-    // retornar mensaje y jugador
-    return { message: message, player: playerBase, isCommon: false }
+    return { message, player: playerBase, isCommon: false, eventType: eventType.DEATH, };
 }
 
-function linkPlayers(playerBase: Player, playersList: Array<Player>, isDuo: boolean) {
-    // filtrar jugadores vivos y que no sean el jugador base
-    let playersOk = playersList.filter(current => current.live && current !== playerBase && !current.amigo);
+function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean): genericEvent {
+    const playersOk = playersList.filter(current =>
+        current.live && current !== playerBase && !current.amigo
+    );
 
     let otherPlayer: Player | null = null;
 
@@ -130,79 +120,89 @@ function linkPlayers(playerBase: Player, playersList: Array<Player>, isDuo: bool
             otherPlayer.SetRelation(playerBase);
             playerBase.SetRelation(otherPlayer);
         }
-        // Obtener mensajes
-        const message = `${playerBase.name} Se unio con ${otherPlayer.name}`;
-        return { message: message, player: playerBase, isCommon: false }
+
+        const message = `${playerBase.name} se unió con ${otherPlayer.name}`;
+        return { message, player: playerBase, isCommon: false, eventType: isDuo ? eventType.DUO : eventType.RELATION, };
     } else {
         console.warn("No hay jugadores válidos disponibles.");
         return farmCasual(playerBase);
     }
-
 }
-function farmCasual(playerBase: Player) {
-    // Dependiendo la suerte del jugador obtener un evento que puede
-    // neutral (No aumenta ni disminuye puntos)
-    // malo (puede disminuir puntos, pero puede salvarse si tiene la suficiente fuerza/vida/suerte)
-    // bueno (aumenta puntos de fuerza/vida/suerte)
 
+function farmCasual(playerBase: Player): genericEvent {
     if (playerBase.suerte < 40) {
         if (playerBase.suerte < 30) {
             if (playerBase.suerte < 20) {
                 if (playerBase.suerte < 10) {
-                    casualEvent.bad = casualEvent.bad * 3
+                    casualEvent.bad *= 3;
                 }
-                casualEvent.bad = casualEvent.bad * 2.5
+                casualEvent.bad *= 2.5;
             }
-            casualEvent.bad = casualEvent.bad * 2
+            casualEvent.bad *= 2;
         }
-        casualEvent.bad = casualEvent.bad * 1.5
+        casualEvent.bad *= 1.5;
     }
 
     if (playerBase.suerte > 70) {
         if (playerBase.suerte > 80) {
             if (playerBase.suerte > 90) {
-                casualEvent.good = casualEvent.good * 2.5;
+                casualEvent.good *= 2.5;
             }
-            casualEvent.good = casualEvent.good * 2;
+            casualEvent.good *= 2;
         }
-        casualEvent.good = casualEvent.good * 1.5;
+        casualEvent.good *= 1.5;
     }
 
-    // Obtener evento de un listado de mensajes con el formato
-    // {mensaje, fuerza, vida, suerte} la fuerza vida o suerte son num negativos o positivos
-    const randomNum = Math.floor(Math.random() * casualEvent.good);
-
-    const message = 'evento casual';
-    return { message: message, player: playerBase, isCommon: true }
+    const message = `${playerBase.name} evento casual`;
+    return {
+        message,
+        player: playerBase,
+        isCommon: true,
+        eventType: eventType.COMMON,
+    };
 }
 
-function farmWeapon(playerBase: Player, playersList: Array<Player>) {
-    // puede craftear armas casuales, como robarlas
+function farmWeapon(playerBase: Player, playersList: Player[]): genericEvent {
     const message = `${playerBase.name} obtuvo un arma casual`;
-    return { message: message, player: playerBase, isCommon: true }
+    return {
+        message,
+        player: playerBase,
+        isCommon: true,
+        eventType: eventType.COMMON,
+    };
 }
 
-function farmBigWeapon(playerBase: Player, playersList: Array<Player>) {
-    // puede craftear armas casuales, como robarlas
+function farmBigWeapon(playerBase: Player, playersList: Player[]): genericEvent {
     const message = `${playerBase.name} obtuvo un arma grande`;
-    return { message: message, player: playerBase, isCommon: true }
+    return {
+        message,
+        player: playerBase,
+        isCommon: true,
+        eventType: eventType.COMMON,
+    };
 }
 
-function heal(playerBase: Player) {
-    // numero random de puntos a revivir
+function heal(playerBase: Player): genericEvent {
     const healAmount = Math.floor(Math.random() * 20);
-
-    // obtener mensaje
-    const message = `${playerBase.name} se curo ${healAmount} puntos de vida con`;
+    const message = `${playerBase.name} se curó ${healAmount} puntos de vida`;
     playerBase.Heal(healAmount);
 
-    return { message: message, player: playerBase, isCommon: true }
+    return {
+        message,
+        player: playerBase,
+        isCommon: true,
+        eventType: eventType.HEAL,
+    };
 }
 
-function revivePlayer(playerBase: Player) {
-    // actualizar info
+function revivePlayer(playerBase: Player): genericEvent {
     playerBase.Revive();
-    // obtener mensaje
-    const message = `${playerBase.name} SE PARO SE PARO SE PARO`;
-    return { message: message, player: playerBase, isCommon: false }
+    const message = `${playerBase.name} ¡SE PARÓ, SE PARÓ, SE PARÓ!`;
+
+    return {
+        message,
+        player: playerBase,
+        isCommon: false,
+        eventType: eventType.REVIVE,
+    };
 }

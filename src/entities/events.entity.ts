@@ -1,12 +1,18 @@
 import { Player } from "./player.entity"
 
-export type comunEvent = {
-    title: string
-    player: Player
+export enum eventType {
+    COMMON = "common",
+    DEATH = "death",
+    KILL = "kill",
+    DUO = "duo",
+    RELATION = "relation",
+    HEAL = "heal",
+    REVIVE = "revive"
 }
 
-export type specialEvent = {
-    title: string
-    players: Array<Player>
-    victims: Array<Player>
+export type genericEvent = {
+    message: string,
+    player: Player,
+    isCommon: boolean,
+    eventType: eventType
 }
