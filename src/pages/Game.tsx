@@ -46,16 +46,12 @@ export default function Game() {
         : special.push(current);
     })
     setCommonEvents(common);
-    // console.log(common);
     setSpecialEvents(special);
-    // console.log(special);
 
     // actualizar array de jugadores
     // let playerList = [...common, ...special]
     //   .map((item => item.player))
     //   .sort((a, b) => a.id - b.id);
-
-    // setPlayers(playerList);
   }
 
   const playersLiving = () => {
