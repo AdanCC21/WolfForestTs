@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Player } from "../entities/player.entity";
 import { useNavigate } from "react-router-dom";
-import { genericEvent } from "../entities/events.entity";
+import { GenericEvent } from "../entities/events.entity";
 import { useGetEvents } from "../hooks/events"
 import ComunEvents from "../components/ComunEvents";
 import EspecialEvent from "../components/EspecialEvent";
@@ -14,8 +14,8 @@ export default function Game() {
   const [players, setPlayers] = useState<Player[]>([]);
 
   const [dayCount, setDayCount] = useState(1);
-  const [commonEvents, setCommonEvents] = useState<Array<genericEvent>>([]);
-  const [specialEvents, setSpecialEvents] = useState<Array<genericEvent>>([]);
+  const [commonEvents, setCommonEvents] = useState<Array<GenericEvent>>([]);
+  const [specialEvents, setSpecialEvents] = useState<Array<GenericEvent>>([]);
 
   const [showCommon, setShowCommon] = useState(true);
   const [showSpecial, setShowSpecial] = useState(false);
@@ -38,8 +38,8 @@ export default function Game() {
   const handleEvents = (loadedPlayers: Player[]) => {
     let eventos = useGetEvents(dayCount, loadedPlayers);
 
-    let common: Array<genericEvent> = [];
-    let special: Array<genericEvent> = [];
+    let common: Array<GenericEvent> = [];
+    let special: Array<GenericEvent> = [];
 
     eventos.forEach((current) => {
       current.isCommon ? common.push(current)
@@ -74,11 +74,11 @@ export default function Game() {
     // ------ Eventos comunes ------
     if (showCommon) {
       return (
-        <section>
+        <section className="flex flex-col w-screen">
           {commonEvents ? (
             <>
-              <ComunEvents day={dayCount} events={commonEvents} playersBase={players} />~
-              <button onClick={() => { setShowSpecial(true); setShowCommon(false); }}>Continuar</button>
+              <ComunEvents day={dayCount} events={commonEvents} playersBase={players} />
+              <button className="w-fit mx-auto my-2" onClick={() => { setShowSpecial(true); setShowCommon(false); }}>Continuar</button>
             </>
           ) : (
             <>
@@ -167,7 +167,7 @@ export default function Game() {
 
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       {handleScreens()}
     </div >
   )

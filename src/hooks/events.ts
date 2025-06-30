@@ -1,5 +1,5 @@
 import { Player } from "../entities/player.entity";
-import { eventType, genericEvent } from "../entities/events.entity";
+import { eventType, GenericEvent } from "../entities/events.entity";
 function randomNumber(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -92,17 +92,17 @@ function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Pl
             return revivePlayer(currentPlayer);
         }
     } else {
-        return { message: "death", player: new Player(), isCommon: true, eventType:eventType.COMMON };
+        return { message: "death", player: new Player(), isCommon: true, eventType: eventType.COMMON };
     }
 }
 // Matar a un jugador por un evento natural
-function playerDeath(playerBase: Player): genericEvent {
+function playerDeath(playerBase: Player): GenericEvent {
     const message = `${playerBase.name} murió por pendejo`;
     playerBase.Death();
     return { message, player: playerBase, isCommon: false, eventType: eventType.DEATH, };
 }
 
-function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean): genericEvent {
+function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean): GenericEvent {
     const playersOk = playersList.filter(current =>
         current.live && current !== playerBase && !current.amigo
     );
@@ -129,7 +129,7 @@ function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean):
     }
 }
 
-function farmCasual(playerBase: Player): genericEvent {
+function farmCasual(playerBase: Player): GenericEvent {
     if (playerBase.suerte < 40) {
         if (playerBase.suerte < 30) {
             if (playerBase.suerte < 20) {
@@ -162,7 +162,24 @@ function farmCasual(playerBase: Player): genericEvent {
     };
 }
 
-function farmWeapon(playerBase: Player, playersList: Player[]): genericEvent {
+interface commonEventEntity {
+    message: string,
+    strength: number,
+    health: number,
+    luck: number
+}
+
+const neutralCommonList: Array<commonEventEntity> = [
+    { message: 'evento comun', strength: 0, health: 0, luck: 0 },
+]
+const goodCommonList: Array<commonEventEntity> = [
+    { message: 'buen evento', strength: 40, health: 10, luck: 0 },
+]
+const badCommonList: Array<commonEventEntity> = [
+    { message: 'evento malo', strength: -10, health: -5, luck: -25 },
+]
+
+function farmWeapon(playerBase: Player, playersList: Player[]): GenericEvent {
     const message = `${playerBase.name} obtuvo un arma casual`;
     return {
         message,
@@ -172,7 +189,7 @@ function farmWeapon(playerBase: Player, playersList: Player[]): genericEvent {
     };
 }
 
-function farmBigWeapon(playerBase: Player, playersList: Player[]): genericEvent {
+function farmBigWeapon(playerBase: Player, playersList: Player[]): GenericEvent {
     const message = `${playerBase.name} obtuvo un arma grande`;
     return {
         message,
@@ -182,7 +199,7 @@ function farmBigWeapon(playerBase: Player, playersList: Player[]): genericEvent 
     };
 }
 
-function heal(playerBase: Player): genericEvent {
+function heal(playerBase: Player): GenericEvent {
     const healAmount = Math.floor(Math.random() * 20);
     const message = `${playerBase.name} se curó ${healAmount} puntos de vida`;
     playerBase.Heal(healAmount);
@@ -195,7 +212,7 @@ function heal(playerBase: Player): genericEvent {
     };
 }
 
-function revivePlayer(playerBase: Player): genericEvent {
+function revivePlayer(playerBase: Player): GenericEvent {
     playerBase.Revive();
     const message = `${playerBase.name} ¡SE PARÓ, SE PARÓ, SE PARÓ!`;
 

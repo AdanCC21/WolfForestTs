@@ -10,7 +10,7 @@ export enum eventType {
     REVIVE = "revive"
 }
 
-export type genericEvent = {
+export type GenericEvent = {
     message: string,
     player: Player,
     isCommon: boolean,

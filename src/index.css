@@ -8,7 +8,19 @@
 }
 
 html {
-  font-size: 10px;
+  font-size: 12px;
+}
+
+@media (max-width:720px){
+  html{
+    font-size: 10px;
+  }
+}
+
+@media (min-width:1024px){
+  html{
+    font-size: 14px;
+  }
 }
 
 a {
@@ -27,7 +39,7 @@ body {
 
 h1 {
   font-size: 3rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 h2 {

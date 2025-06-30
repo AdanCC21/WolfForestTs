@@ -12,7 +12,7 @@ type Prompts = {
 export default function CommonCard({ eventPlayer, playerBase, message }: Prompts) {
     return (
         <article className="flex flex-col items-center">
-            <img className="w-[50px] md:w-[150px] mx-auto my-2 h-fit"
+            <img className="w-[50px] md:w-[150px] lg:w-[250px] mx-auto my-2 h-fit rounded-lg"
                 src={eventPlayer.image} alt={eventPlayer.name} />
             <h4 className="font-bold">{eventPlayer.name}</h4>
             <p>{message}</p>
