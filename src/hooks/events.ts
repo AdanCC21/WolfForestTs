@@ -40,14 +40,6 @@ const nightEventsList = {
     // 98-100
     revive: 100,
 }
-const casualEvent = {
-    // 0 -> 19
-    bad: 20,
-    // 20 -> 79
-    neutral: 80,
-    // 80 -> 100
-    good: 100
-}
 
 export function useGetEvents(dayNumber: number, playersList: Array<Player>) {
     if (dayNumber % 2 === 0) {
@@ -60,7 +52,6 @@ export function useGetEvents(dayNumber: number, playersList: Array<Player>) {
         })
     }
 }
-
 
 // lista de eventos
 function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Player>) {
@@ -129,29 +120,112 @@ function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean):
     }
 }
 
+// ------ Eventos Comunes ------ //
+const commonEventsProb = {
+    // 0 -> 19
+    bad: 33.3,
+    // 20 -> 79
+    neutral: 33.3,
+    // 80 -> 100
+    good: 33.3
+}
+interface commonEventEntity {
+    message: string,
+    strength: number,
+    health: number,
+    luck: number
+}
+const neutralCommonList: Array<commonEventEntity> = [
+    { message: 'evento comun', strength: 0, health: 0, luck: 0 },
+    { message: 'evento comun1', strength: 0, health: 0, luck: 0 },
+    { message: 'evento comun2', strength: 0, health: 0, luck: 0 },
+    { message: 'evento comun3', strength: 0, health: 0, luck: 0 },
+    { message: 'evento comun4', strength: 0, health: 0, luck: 0 },
+    { message: 'evento comun5', strength: 0, health: 0, luck: 0 },
+    { message: 'evento comun6', strength: 0, health: 0, luck: 0 },
+    { message: 'evento comun7', strength: 0, health: 0, luck: 0 },
+]
+const goodCommonList: Array<commonEventEntity> = [
+    { message: 'buen evento', strength: 40, health: 10, luck: 0 },
+    { message: 'buen evento1', strength: 40, health: 10, luck: 0 },
+    { message: 'buen evento2', strength: 40, health: 10, luck: 0 },
+    { message: 'buen evento3', strength: 40, health: 10, luck: 0 },
+    { message: 'buen evento4', strength: 40, health: 10, luck: 0 },
+    { message: 'buen evento5', strength: 40, health: 10, luck: 0 },
+    { message: 'buen evento6', strength: 40, health: 10, luck: 0 },
+    { message: 'buen evento7', strength: 40, health: 10, luck: 0 },
+]
+const badCommonList: Array<commonEventEntity> = [
+    { message: 'evento malo', strength: -10, health: -5, luck: -25 },
+    { message: 'evento malo1', strength: -10, health: -5, luck: -25 },
+    { message: 'evento malo2', strength: -10, health: -5, luck: -25 },
+    { message: 'evento malo3', strength: -10, health: -5, luck: -25 },
+    { message: 'evento malo4', strength: -10, health: -5, luck: -25 },
+    { message: 'evento malo5', strength: -10, health: -5, luck: -25 },
+    { message: 'evento malo6', strength: -10, health: -5, luck: -25 },
+    { message: 'evento malo7', strength: -10, health: -5, luck: -25 },
+]
+
 function farmCasual(playerBase: Player): GenericEvent {
+    const tempEventsProb = { ...commonEventsProb };
     if (playerBase.suerte < 40) {
         if (playerBase.suerte < 30) {
             if (playerBase.suerte < 20) {
                 if (playerBase.suerte < 10) {
-                    casualEvent.bad *= 3;
+                    tempEventsProb.bad *= 3;
+                } else {
+                    tempEventsProb.bad *= 2.5;
                 }
-                casualEvent.bad *= 2.5;
+            } else {
+                tempEventsProb.bad *= 2;
             }
-            casualEvent.bad *= 2;
+        } else {
+            tempEventsProb.bad *= 1.5;
         }
-        casualEvent.bad *= 1.5;
-    }
 
-    if (playerBase.suerte > 70) {
+        // Actualizar good && neutral rangos
+        tempEventsProb.good = (100 - tempEventsProb.bad) / 2;
+        tempEventsProb.neutral = (100 - tempEventsProb.bad) / 2;
+
+        console.log('bad')
+        console.log(tempEventsProb)
+    }
+    else if (playerBase.suerte > 70) {
         if (playerBase.suerte > 80) {
             if (playerBase.suerte > 90) {
-                casualEvent.good *= 2.5;
+                tempEventsProb.good *= 2.5;
+            } else {
+
+                tempEventsProb.good *= 2;
             }
-            casualEvent.good *= 2;
+        } else {
+
+            tempEventsProb.good *= 1.5;
         }
-        casualEvent.good *= 1.5;
+
+        // Actualizar good && neutral rangos
+        tempEventsProb.bad = (100 - tempEventsProb.good) / 2;
+        tempEventsProb.neutral = (100 - tempEventsProb.good) / 2;
+
+        console.log('good');
+        console.log(tempEventsProb);
     }
+
+    tempEventsProb.neutral = tempEventsProb.bad + tempEventsProb.neutral;
+    // este deberia de ser 100
+    tempEventsProb.good = tempEventsProb.neutral + tempEventsProb.good;
+    console.log('actualizado')
+    console.log(tempEventsProb)
+
+    // let r = Math.floor((Math.random() * 100) + 1);
+    // if (r < tempEventsProb.good) {
+    //     if (r < tempEventsProb.neutral) {
+    //         if (r < tempEventsProb.bad) {
+    //             let message = `${playerBase.name} evento malo`
+    //             return
+    //         }
+    //     }
+    // }
 
     const message = `${playerBase.name} evento casual`;
     return {
@@ -161,23 +235,6 @@ function farmCasual(playerBase: Player): GenericEvent {
         eventType: eventType.COMMON,
     };
 }
-
-interface commonEventEntity {
-    message: string,
-    strength: number,
-    health: number,
-    luck: number
-}
-
-const neutralCommonList: Array<commonEventEntity> = [
-    { message: 'evento comun', strength: 0, health: 0, luck: 0 },
-]
-const goodCommonList: Array<commonEventEntity> = [
-    { message: 'buen evento', strength: 40, health: 10, luck: 0 },
-]
-const badCommonList: Array<commonEventEntity> = [
-    { message: 'evento malo', strength: -10, health: -5, luck: -25 },
-]
 
 function farmWeapon(playerBase: Player, playersList: Player[]): GenericEvent {
     const message = `${playerBase.name} obtuvo un arma casual`;
