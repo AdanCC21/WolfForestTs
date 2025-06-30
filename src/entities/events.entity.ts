@@ -1,11 +1,15 @@
 import { Player } from "./player.entity"
 
-export type comunEvent = {
-    title: string
+export type CommonEvent = {
+    message: string
     player: Player
+    
+    fuerza: number
+    vida: number
+    suerte: number
 }
 
-export type specialEvent = {
+export type SpecialEvent = {
     title: string
     players: Array<Player>
     victims: Array<Player>

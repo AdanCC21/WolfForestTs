@@ -13,8 +13,8 @@ export default function Game() {
   const [players, setPlayers] = useState<Player[]>([]);
 
   const [dayCount, setDayCount] = useState(1);
-  const [commonEvents, setCommonEvents] = useState<Array<genericEvent>>();
-  const [specialEvents, setSpecialEvents] = useState<Array<genericEvent>>();
+  const [commonEvents, setCommonEvents] = useState<Array<genericEvent>>([]);
+  const [specialEvents, setSpecialEvents] = useState<Array<genericEvent>>([]);
 
   const [showCommon, setShowCommon] = useState(true);
   const [showSpecial, setShowSpecial] = useState(false);
@@ -45,16 +45,16 @@ export default function Game() {
         : special.push(current);
     })
     setCommonEvents(common);
-    console.log(common);
+    // console.log(common);
     setSpecialEvents(special);
-    console.log(special);
+    // console.log(special);
 
-    // actualizar array
-    let playerList = [...common, ...special]
-      .map((item => item.player))
-      .sort((a, b) => a.id - b.id);
+    // actualizar array de jugadores
+    // let playerList = [...common, ...special]
+    //   .map((item => item.player))
+    //   .sort((a, b) => a.id - b.id);
 
-    setPlayers(playerList);
+    // setPlayers(playerList);
   }
 
   const playersLiving = () => {
@@ -65,23 +65,22 @@ export default function Game() {
 
   useEffect(() => {
     if (players.length === 0) {
-      console.log('cargo');
       const loadedPlayers = loadPlayers();
-      console.log(loadedPlayers);
+      setPlayers(loadPlayers);
       handleEvents(loadedPlayers);
     } else {
-      console.log('eventos');
       handleEvents(players);
     }
   }, [dayCount])
 
   const handleScreens = () => {
+    // ------ Eventos comunes ------
     if (showCommon) {
       return (
         <section>
           {commonEvents ? (
             <>
-              <ComunEvents day={dayCount} events={commonEvents} />
+              <ComunEvents day={dayCount} events={commonEvents} playersBase={players} />~
               <button onClick={() => { setShowSpecial(true); setShowCommon(false); }}>Continuar</button>
             </>
           ) : (
@@ -91,6 +90,7 @@ export default function Game() {
       );
     }
 
+    // ------ Eventos Especiales ------
     if (showSpecial) {
       return (
         <section>
@@ -98,7 +98,16 @@ export default function Game() {
           {specialEvents ? (
             <EspecialEvent
               events={specialEvents}
-              whenFinish={() => { setShowSummary(true); setShowSpecial(false); }}
+              whenFinish={() => {
+                // actualizar jugadores
+                let playerList = [...commonEvents, ...specialEvents]
+                  .map((item => item.player))
+                  .sort((a, b) => a.id - b.id);
+                setPlayers(playerList);
+
+                setShowSummary(true);
+                setShowSpecial(false);
+              }}
             />
           ) : (
             <p>No hay eventos especiales</p>
@@ -107,6 +116,7 @@ export default function Game() {
       );
     }
 
+    // ------ Resumen del dia/noche ------
     if (showSummary) {
       return (
         <section>
@@ -126,7 +136,7 @@ export default function Game() {
       );
     }
 
-    // Winner
+    // ------ Ganador o reinicio de juego ------
     let playersInGame = playersLiving();
     if (playersInGame.length <= 1) {
       if (playersInGame.length === 1) {
@@ -145,6 +155,8 @@ export default function Game() {
         )
       }
     } else {
+
+      // Sumar un dia
       setDayCount(prev => prev + 1);
       setShowCommon(true);
     }
