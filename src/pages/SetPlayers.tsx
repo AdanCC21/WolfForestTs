@@ -48,36 +48,38 @@ export default function SetPlayers() {
 
 
     return (
-        <>
-            <header>
+        <div className="flex flex-col justify-between min-h-screen overflow-x-hidden">
+            <header className="w-screen flex flex-col items-center my-5">
                 <h1>Jugadores</h1>
                 <p>Players Number : {players.length}</p>
                 <span>{alert}</span>
             </header>
 
-            <main>
-                <section>
+            <main className="flex flex-col w-screen items-center">
+                <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5 w-8/10 my-3">
                     {players.map((current) => (
-                        <article key={current.id}>
-                            <img src={current.image || 'w'} alt={current.name} />
-                            <div>
+                        <article key={current.id} className="flex flex-col overflow-hidden">
+                            <img className="w-[50px] md:w-[150px] mx-auto my-2" src={current.image || 'w'} alt={current.name} />
+                            <div className="my-2 w-full">
                                 <input placeholder="Image Url" value={current.image} name="image"
-                                    onChange={(e) => { handleChange(e, current) }} />
+                                    onChange={(e) => { handleChange(e, current) }}
+                                    className="my-1 bg-black rounded-lg px-2 py-1 w-full overflow-ellipsis" />
                                 <input placeholder="Image Url" value={current.name} name="name"
-                                    onChange={(e) => { handleChange(e, current) }} />
+                                    onChange={(e) => { handleChange(e, current) }}
+                                    className="my-1 bg-black rounded-lg px-2 py-1 w-full overflow-ellipsis" />
                             </div>
                             <button>Delete</button>
                         </article>
                     ))}
-                    <button onClick={() => { addPlayer() }}>+ Add Player</button>
+                    <button className="my-auto mx-auto size-fit" onClick={() => { addPlayer() }}>+ Add Player</button>
                 </section>
 
-                <button onClick={() => { play() }}>Jugar</button>
+                <button className="w-fit" onClick={() => { play() }}>Jugar</button>
             </main>
 
-            <footer>
+            <footer className="flex flex-col items-center w-screen min-h-[10vh]">
                 @Adan Gonzalez Cesena
             </footer>
-        </>
+        </div>
     )
 }
