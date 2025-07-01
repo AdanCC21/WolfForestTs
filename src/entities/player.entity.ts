@@ -1,3 +1,4 @@
+import { CommonEvent } from "./events.entity";
 import { Arma } from "./weapon.entity";
 
 export type newPlayer = {
@@ -57,6 +58,12 @@ export class Player {
 
     public SetRelation(player: Player): void {
         this.pareja = player;
+    }
+
+    public UpdateAttributes(event: CommonEvent) {
+        this.fuerza += event.fuerza;
+        this.vida += event.vida;
+        this.suerte += event.suerte;
     }
 
     static fromJSON(json: any): Player {

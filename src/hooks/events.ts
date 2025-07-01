@@ -122,7 +122,7 @@ function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean):
                 players: [playerBase],
                 victims: [otherPlayer],
             }
-            return { isCommon: false, event: specialEvent, playerOrigin:playerBase }
+            return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
         } else {
             otherPlayer.SetRelation(playerBase);
             playerBase.SetRelation(otherPlayer);
@@ -135,7 +135,7 @@ function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean):
                 victims: [otherPlayer],
             }
 
-            return { isCommon: false, event: specialEvent, playerOrigin:playerBase }
+            return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
         }
     } else {
         console.warn("No hay jugadores válidos disponibles.");
@@ -154,7 +154,7 @@ function heal(playerBase: Player): GenericEvent {
         victims: [],
     }
 
-    return { isCommon: false, event: specialEvent, playerOrigin:playerBase }
+    return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
 }
 
 function revivePlayer(playerBase: Player): GenericEvent {
@@ -168,20 +168,18 @@ function revivePlayer(playerBase: Player): GenericEvent {
         victims: []
     }
 
-    return { isCommon: false, event: specialEvent, playerOrigin:playerBase }
+    return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
 }
 
 // --------------- MATAR A UN JUGADOR ---------------
 
 // ------ Eventos Comunes ------ //
 const commonEventsProb = {
-    // 0 -> 19
     bad: 33.3,
-    // 20 -> 79
     neutral: 33.3,
-    // 80 -> 100
-    good: 33.3
+    good: 33.4
 }
+
 interface commonEventEntity {
     message: string,
     strength: number,
@@ -221,72 +219,86 @@ const badCommonList: Array<commonEventEntity> = [
 
 function farmCasual(playerBase: Player): GenericEvent {
     const tempEventsProb = { ...commonEventsProb };
-    if (playerBase.suerte < 40) {
-        if (playerBase.suerte < 30) {
-            if (playerBase.suerte < 20) {
-                if (playerBase.suerte < 10) {
-                    tempEventsProb.bad *= 3;
-                } else {
-                    tempEventsProb.bad *= 2.5;
-                }
+    if (playerBase.suerte < 30) {
+        if (playerBase.suerte < 20) {
+            if (playerBase.suerte < 10) {
+                //10
+                tempEventsProb.bad *= 2.5;
             } else {
+                //20
                 tempEventsProb.bad *= 2;
             }
         } else {
+            //30
             tempEventsProb.bad *= 1.5;
         }
 
         // Actualizar good && neutral rangos
-        tempEventsProb.good = (100 - tempEventsProb.bad) / 2;
         tempEventsProb.neutral = (100 - tempEventsProb.bad) / 2;
-
-        console.log('bad')
-        console.log(tempEventsProb)
+        tempEventsProb.good = (100 - tempEventsProb.bad) / 2;
     }
     else if (playerBase.suerte > 70) {
         if (playerBase.suerte > 80) {
             if (playerBase.suerte > 90) {
+                // 90
                 tempEventsProb.good *= 2.5;
             } else {
-
+                // 80
                 tempEventsProb.good *= 2;
             }
         } else {
-
+            // 70
             tempEventsProb.good *= 1.5;
         }
 
         // Actualizar good && neutral rangos
         tempEventsProb.bad = (100 - tempEventsProb.good) / 2;
         tempEventsProb.neutral = (100 - tempEventsProb.good) / 2;
-
-        console.log('good');
-        console.log(tempEventsProb);
     }
-
+    // sumamos rangos
     tempEventsProb.neutral = tempEventsProb.bad + tempEventsProb.neutral;
-    // este deberia de ser 100
     tempEventsProb.good = tempEventsProb.neutral + tempEventsProb.good;
-    console.log('actualizado')
-    console.log(tempEventsProb)
 
-    // let r = Math.floor((Math.random() * 100) + 1);
-    // if (r < tempEventsProb.good) {
-    //     if (r < tempEventsProb.neutral) {
-    //         if (r < tempEventsProb.bad) {
-    //             let message = `${playerBase.name} evento malo`
-    //             return
-    //         }
-    //     }
-    // }
+    let r = Math.floor((Math.random() * 100) + 1);
+    let message = "";
+    let commonEvent: CommonEvent;
 
-    const message = `${playerBase.name} evento casual`;
-    let commonEvent: CommonEvent = {
-        message: message,
-        player: playerBase,
-        fuerza: 0, vida: 0, suerte: 0
+    if (r < tempEventsProb.bad) {
+        message = `${playerBase.name} evento malo`;
+        commonEvent = {
+            message,
+            player: playerBase,
+            fuerza: -10,
+            vida: -5,
+            suerte: -5
+        };
+    } else if (r < tempEventsProb.neutral) {
+        message = `${playerBase.name} evento neutral`;
+        commonEvent = {
+            message,
+            player: playerBase,
+            fuerza: 0,
+            vida: 0,
+            suerte: 0
+        };
+    } else {
+        message = `${playerBase.name} evento bueno`;
+        commonEvent = {
+            message,
+            player: playerBase,
+            fuerza: +10,
+            vida: +5,
+            suerte: 0
+        };
     }
-    return { isCommon: true, event: commonEvent, playerOrigin:playerBase }
+
+    playerBase.UpdateAttributes(commonEvent);
+    commonEvent.player = playerBase
+    return {
+        isCommon: true,
+        event: commonEvent,
+        playerOrigin: playerBase
+    };
 }
 
 function farmWeapon(playerBase: Player, playersList: Player[]): GenericEvent {

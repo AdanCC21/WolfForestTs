@@ -12,7 +12,7 @@ export default function SummaryCard({ player }: Prompts) {
             <p>{player.name}</p>
             <ul className='flex justify-between'>
                 <small>Vida: <br />
-                    <small className={`${player.vida < 30 ? 'text-red-500' : ''} ${player.vida >= 80 ? 'text-green-500' : ''}`}>
+                    <small className={`${player.vida < 30 ? 'text-red-500' : ''} ${player.vida > 80 ? 'text-green-500' : ''}`}>
                         {player.vida}
                     </small>
                 </small>
