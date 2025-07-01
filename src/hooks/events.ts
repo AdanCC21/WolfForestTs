@@ -1,5 +1,5 @@
 import { Player } from "../entities/player.entity";
-import { eventType, GenericEvent } from "../entities/events.entity";
+import { CommonEvent, eventType, GenericEvent, SpecialEvent } from "../entities/events.entity";
 function randomNumber(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -52,7 +52,6 @@ export function useGetEvents(dayNumber: number, playersList: Array<Player>) {
         })
     }
 }
-
 // lista de eventos
 function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Player>) {
     let luckEvent = randomNumber(0, 100);
@@ -83,14 +82,22 @@ function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Pl
             return revivePlayer(currentPlayer);
         }
     } else {
-        return { message: "death", player: new Player(), isCommon: true, eventType: eventType.COMMON };
+        // jugador muerto
+        return null;
     }
 }
+
 // Matar a un jugador por un evento natural
 function playerDeath(playerBase: Player): GenericEvent {
     const message = `${playerBase.name} murió por pendejo`;
     playerBase.Death();
-    return { message, player: playerBase, isCommon: false, eventType: eventType.DEATH, };
+    let specialEvent: SpecialEvent = {
+        message: message,
+        eventType: eventType.DEATH,
+        players: [playerBase],
+        victims: []
+    }
+    return { isCommon: false, event: specialEvent, playerOrigin: playerBase };
 }
 
 function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean): GenericEvent {
@@ -107,18 +114,64 @@ function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean):
         if (isDuo) {
             otherPlayer.SetFriend(playerBase);
             playerBase.SetFriend(otherPlayer);
+
+            const message = `${playerBase.name} se unió con ${otherPlayer.name}`;
+            let specialEvent: SpecialEvent = {
+                message: message,
+                eventType: eventType.DUO,
+                players: [playerBase],
+                victims: [otherPlayer],
+            }
+            return { isCommon: false, event: specialEvent, playerOrigin:playerBase }
         } else {
             otherPlayer.SetRelation(playerBase);
             playerBase.SetRelation(otherPlayer);
-        }
 
-        const message = `${playerBase.name} se unió con ${otherPlayer.name}`;
-        return { message, player: playerBase, isCommon: false, eventType: isDuo ? eventType.DUO : eventType.RELATION, };
+            const message = `${playerBase.name} se unió en una relacion con ${otherPlayer.name}`;
+            let specialEvent: SpecialEvent = {
+                message: message,
+                eventType: eventType.RELATION,
+                players: [playerBase],
+                victims: [otherPlayer],
+            }
+
+            return { isCommon: false, event: specialEvent, playerOrigin:playerBase }
+        }
     } else {
         console.warn("No hay jugadores válidos disponibles.");
         return farmCasual(playerBase);
     }
 }
+
+function heal(playerBase: Player): GenericEvent {
+    const healAmount = Math.floor(Math.random() * 20);
+    const message = `${playerBase.name} se curó ${healAmount} puntos de vida`;
+    playerBase.Heal(healAmount);
+    let specialEvent: SpecialEvent = {
+        message: message,
+        eventType: eventType.HEAL,
+        players: [playerBase],
+        victims: [],
+    }
+
+    return { isCommon: false, event: specialEvent, playerOrigin:playerBase }
+}
+
+function revivePlayer(playerBase: Player): GenericEvent {
+    playerBase.Revive();
+    const message = `${playerBase.name} ¡SE PARÓ, SE PARÓ, SE PARÓ!`;
+
+    let specialEvent: SpecialEvent = {
+        message: message,
+        eventType: eventType.REVIVE,
+        players: [playerBase],
+        victims: []
+    }
+
+    return { isCommon: false, event: specialEvent, playerOrigin:playerBase }
+}
+
+// --------------- MATAR A UN JUGADOR ---------------
 
 // ------ Eventos Comunes ------ //
 const commonEventsProb = {
@@ -228,55 +281,30 @@ function farmCasual(playerBase: Player): GenericEvent {
     // }
 
     const message = `${playerBase.name} evento casual`;
-    return {
-        message,
+    let commonEvent: CommonEvent = {
+        message: message,
         player: playerBase,
-        isCommon: true,
-        eventType: eventType.COMMON,
-    };
+        fuerza: 0, vida: 0, suerte: 0
+    }
+    return { isCommon: true, event: commonEvent, playerOrigin:playerBase }
 }
 
 function farmWeapon(playerBase: Player, playersList: Player[]): GenericEvent {
     const message = `${playerBase.name} obtuvo un arma casual`;
-    return {
+    let commonEvent: CommonEvent = {
         message,
         player: playerBase,
-        isCommon: true,
-        eventType: eventType.COMMON,
+        fuerza: 0, vida: 0, suerte: 0
     };
+    return { isCommon: true, event: commonEvent, playerOrigin: playerBase };
 }
 
 function farmBigWeapon(playerBase: Player, playersList: Player[]): GenericEvent {
     const message = `${playerBase.name} obtuvo un arma grande`;
-    return {
+    let commonEvent: CommonEvent = {
         message,
         player: playerBase,
-        isCommon: true,
-        eventType: eventType.COMMON,
+        fuerza: 0, vida: 0, suerte: 0
     };
-}
-
-function heal(playerBase: Player): GenericEvent {
-    const healAmount = Math.floor(Math.random() * 20);
-    const message = `${playerBase.name} se curó ${healAmount} puntos de vida`;
-    playerBase.Heal(healAmount);
-
-    return {
-        message,
-        player: playerBase,
-        isCommon: true,
-        eventType: eventType.HEAL,
-    };
-}
-
-function revivePlayer(playerBase: Player): GenericEvent {
-    playerBase.Revive();
-    const message = `${playerBase.name} ¡SE PARÓ, SE PARÓ, SE PARÓ!`;
-
-    return {
-        message,
-        player: playerBase,
-        isCommon: false,
-        eventType: eventType.REVIVE,
-    };
+    return { isCommon: true, event: commonEvent, playerOrigin: playerBase };
 }

@@ -11,23 +11,23 @@ export enum eventType {
 }
 
 export type GenericEvent = {
-    message: string,
-    player: Player,
-    isCommon: boolean,
-    eventType: eventType
+    isCommon: boolean
+    event: any
+    playerOrigin: Player
 }
 
 export type CommonEvent = {
     message: string
     player: Player
-    
+
     fuerza: number
     vida: number
     suerte: number
 }
 
 export type SpecialEvent = {
-    title: string
+    message: string
+    eventType: eventType
     players: Array<Player>
     victims: Array<Player>
 }

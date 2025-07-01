@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Player } from "../entities/player.entity";
 import { useNavigate } from "react-router-dom";
-import { GenericEvent } from "../entities/events.entity";
+import { CommonEvent, GenericEvent, SpecialEvent } from "../entities/events.entity";
 import { useGetEvents } from "../hooks/events"
 import ComunEvents from "../components/ComunEvents";
 import EspecialEvent from "../components/EspecialEvent";
@@ -14,8 +14,9 @@ export default function Game() {
   const [players, setPlayers] = useState<Player[]>([]);
 
   const [dayCount, setDayCount] = useState(1);
-  const [commonEvents, setCommonEvents] = useState<Array<GenericEvent>>([]);
-  const [specialEvents, setSpecialEvents] = useState<Array<GenericEvent>>([]);
+  const [commonEvents, setCommonEvents] = useState<Array<CommonEvent>>([]);
+  const [specialEvents, setSpecialEvents] = useState<Array<SpecialEvent>>([]);
+  const [genericEvents, setEvents] = useState<Array<GenericEvent>>([])
 
   const [showCommon, setShowCommon] = useState(true);
   const [showSpecial, setShowSpecial] = useState(false);
@@ -38,15 +39,20 @@ export default function Game() {
   const handleEvents = (loadedPlayers: Player[]) => {
     let eventos = useGetEvents(dayCount, loadedPlayers);
 
-    let common: Array<GenericEvent> = [];
-    let special: Array<GenericEvent> = [];
+    let common: Array<CommonEvent> = [];
+    let special: Array<SpecialEvent> = [];
 
+    let finalEvents: Array<GenericEvent> = []
     eventos.forEach((current) => {
-      current.isCommon ? common.push(current)
-        : special.push(current);
+      if (current !== null) {
+        current.isCommon ? common.push(current.event)
+          : special.push(current.event);
+        finalEvents.push(current);
+      }
     })
     setCommonEvents(common);
     setSpecialEvents(special);
+    setEvents(finalEvents);
 
     // actualizar array de jugadores
     // let playerList = [...common, ...special]
@@ -94,15 +100,14 @@ export default function Game() {
     if (showSpecial) {
       return (
         <section>
-          <h2>Evento especial</h2>
           {specialEvents?.length ? (
             <EspecialEvent
               events={specialEvents}
               whenFinish={() => {
                 // actualizar jugadores
-                let playerList = [...commonEvents, ...specialEvents]
-                  .map((item => item.player))
-                  .sort((a, b) => a.id - b.id);
+                let playerList: Array<Player> =
+                  genericEvents.map((item => item.playerOrigin))
+                    .sort((a, b) => a.id - b.id);
                 setPlayers(playerList);
 
                 setShowSummary(true);
@@ -112,7 +117,16 @@ export default function Game() {
           ) : (
             <>
               <p>No hay eventos especiales</p>
-              <button onClick={() => { setShowSummary(true); setShowSpecial(false) }}>Continuar</button>
+              <button onClick={() => {
+                // actualizar jugadores
+                let playerList: Array<Player> =
+                  genericEvents.map((item => item.playerOrigin))
+                    .sort((a, b) => a.id - b.id);
+                setPlayers(playerList);
+
+                setShowSummary(true);
+                setShowSpecial(false);
+              }}>Continuar</button>
             </>
           )}
         </section>
@@ -122,17 +136,15 @@ export default function Game() {
     // ------ Resumen del dia/noche ------
     if (showSummary) {
       return (
-        <section>
-          <h1>Resumen</h1>
-          {players.map((current) => {
-            console.log(current);
-            return (
+        <section className="flex flex-col">
+          <h1 className="text-center my-5">Resumen</h1>
+          <section className="grid grid-cols-5 gap-5 mx-[20vw]">
+            {players.map((current) => (
               <SummaryCard player={current} />
-            )
-          })}
-          <button onClick={() => {
-            setShowSummary(false);
-          }}>
+            ))}
+          </section>
+          <button onClick={() => { setShowSummary(false); }}
+            className="w-fit mx-auto">
             Siguiente día
           </button>
         </section>
