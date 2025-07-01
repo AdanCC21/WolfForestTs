@@ -5,7 +5,7 @@ import { CommonEvent, GenericEvent, SpecialEvent } from "../entities/events.enti
 import { useGetEvents } from "../hooks/events"
 import ComunEvents from "../components/ComunEvents";
 import EspecialEvent from "../components/EspecialEvent";
-import SummaryCard from "../components/SummaryCard";
+import SummaryCard from "../components/cards/SummaryCard";
 
 // no debe de recargar la pagina
 // Hacer que cargue los jugadores desde aqui, osea crear los objeto PLAYER desde aqui y no desde el set, solo recibir nombre e imagen
@@ -42,22 +42,15 @@ export default function Game() {
     let common: Array<CommonEvent> = [];
     let special: Array<SpecialEvent> = [];
 
-    let finalEvents: Array<GenericEvent> = []
     eventos.forEach((current) => {
-      if (current !== null) {
+      if (current.event) {
         current.isCommon ? common.push(current.event)
           : special.push(current.event);
-        finalEvents.push(current);
       }
     })
     setCommonEvents(common);
     setSpecialEvents(special);
-    setEvents(finalEvents);
-
-    // actualizar array de jugadores
-    // let playerList = [...common, ...special]
-    //   .map((item => item.player))
-    //   .sort((a, b) => a.id - b.id);
+    setEvents(eventos);
   }
 
   const playersLiving = () => {
@@ -137,7 +130,7 @@ export default function Game() {
     if (showSummary) {
       return (
         <section className="flex flex-col">
-          <h1 className="text-center my-5">Resumen</h1>
+          <h1 className="text-center my-5">Jugadores</h1>
           <section className="grid grid-cols-5 gap-5 mx-[20vw]">
             {players.map((current) => (
               <SummaryCard player={current} />

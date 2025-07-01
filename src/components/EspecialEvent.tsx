@@ -55,7 +55,7 @@ export default function EspecialEvent({ events, whenFinish }: Prompts) {
       </section>
       <div className="flex flex-col h-full">
         <img src={`eventIcons/${handleIcon()}`} className="w-fit h-20 mx-auto mb-2" />
-        <p className="text-lg my-auto mx-5">{currentEvent.message}</p>
+        <h3 className="text-lg my-auto mx-5">{currentEvent.message}</h3>
       </div>
 
       <section className={`grid ${currentEvent.victims.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
@@ -76,10 +76,13 @@ export default function EspecialEvent({ events, whenFinish }: Prompts) {
 
     return (
       <article key={currentIndex} className="flex flex-col">
-        <img src={`eventIcons/${handleIcon()}`} className="w-fit h-30 mx-auto mb-5" />
-        <img src={player.image} alt={player.name}
-          className="w-fit h-30 rounded-md object-cover mx-auto mb-4" />
-        <p className="text-lg my-auto mx-5">{currentEvent.message}</p>
+        <div className="relative mb-5">
+          <img src={player.image} alt={player.name}
+            className="w-fit h-80 rounded-md object-cover mx-auto mb-4" />
+          <img src={`eventIcons/${handleIcon()}`}
+            className="absolute -top-10 left-1/2 translate-x-[-50%] w-fit h-20"/>
+        </div>
+        <h4 className="text-lg my-auto font-bold">{currentEvent.message}</h4>
       </article>
     )
   }
@@ -93,7 +96,7 @@ export default function EspecialEvent({ events, whenFinish }: Prompts) {
         <>{singlePlayer()}</>
       )}
 
-      <button className="mt-8 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onClick={handleNext} >
+      <button className="absolute bottom-1/10 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onClick={handleNext} >
         {isLastEvent ? "Finalizar" : "Siguiente"}
       </button>
     </section>

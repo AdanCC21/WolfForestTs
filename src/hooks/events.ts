@@ -7,11 +7,13 @@ function randomNumber(min: number, max: number): number {
 const dayEventsList = {
     //0 -> 19
     death: 20,
-    //20 -> 29
-    deal: 30,
-    // 29 -> 34
-    relation: 35,
-    //35 -> 79 (comida, refugio, caza etc)
+    //20 -> 34
+    kill: 35,
+    //35 -> 39
+    deal: 40,
+    // 40 -> 44
+    relation: 45,
+    //45 -> 79 (comida, refugio, caza etc)
     farmCasual: 80,
     // 80 -> 86 (Arco, Hacha)
     farmWeapon: 87,
@@ -25,10 +27,12 @@ const dayEventsList = {
 const nightEventsList = {
     //0 -> 34
     death: 35,
-    //35 -> 39
-    deal: 40,
-    // 40 -> 54
-    relation: 55,
+    //35 -> 49
+    kill: 50,
+    //50 -> 59
+    deal: 60,
+    // 60 -> 64
+    relation: 65,
     //55 -> 79 (comida, refugio, caza etc)
     farmCasual: 80,
     // 80 -> 86 (Arco, Hacha)
@@ -44,29 +48,31 @@ const nightEventsList = {
 export function useGetEvents(dayNumber: number, playersList: Array<Player>) {
     if (dayNumber % 2 === 0) {
         return playersList.map((current) => {
-            return getEvents(dayEventsList, current, playersList);
+            return getEvents(dayEventsList, current, playersList, true);
         })
     } else {
         return playersList.map((current) => {
-            return getEvents(nightEventsList, current, playersList);
+            return getEvents(nightEventsList, current, playersList, false);
         })
     }
 }
 // lista de eventos
-function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Player>) {
+function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Player>, isDay: boolean): GenericEvent {
     let luckEvent = randomNumber(0, 100);
     if (currentPlayer.live) {
-        if (luckEvent < eventsList.death) return playerDeath(currentPlayer);
+        if (luckEvent < eventsList.death) return playerDeath(currentPlayer, isDay);
 
-        if (luckEvent < eventsList.deal) return linkPlayers(currentPlayer, playersList, true);
+        if (luckEvent < eventsList.kill) return killPlayer(currentPlayer, playersList, isDay);
 
-        if (luckEvent < eventsList.relation) return linkPlayers(currentPlayer, playersList, false);
+        if (luckEvent < eventsList.deal) return linkPlayers(currentPlayer, playersList, true, isDay);
 
-        if (luckEvent < eventsList.farmCasual) return farmCasual(currentPlayer);
+        if (luckEvent < eventsList.relation) return linkPlayers(currentPlayer, playersList, false, isDay);
 
-        if (luckEvent < eventsList.farmWeapon) return farmWeapon(currentPlayer, playersList);
+        if (luckEvent < eventsList.farmCasual) return farmCasual(currentPlayer, isDay);
 
-        if (luckEvent < eventsList.farmBigWeapon) return farmBigWeapon(currentPlayer, playersList);
+        if (luckEvent < eventsList.farmWeapon) return farmWeapon(currentPlayer, playersList, isDay);
+
+        if (luckEvent < eventsList.farmBigWeapon) return farmBigWeapon(currentPlayer, playersList, isDay);
 
         if (luckEvent < eventsList.heal) {
             return heal(currentPlayer);
@@ -82,13 +88,12 @@ function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Pl
             return revivePlayer(currentPlayer);
         }
     } else {
-        // jugador muerto
-        return null;
+        return { isCommon: false, event: false, playerOrigin: currentPlayer };
     }
 }
 
 // Matar a un jugador por un evento natural
-function playerDeath(playerBase: Player): GenericEvent {
+function playerDeath(playerBase: Player, isDay: boolean): GenericEvent {
     const message = `${playerBase.name} murió por pendejo`;
     playerBase.Death();
     let specialEvent: SpecialEvent = {
@@ -100,7 +105,22 @@ function playerDeath(playerBase: Player): GenericEvent {
     return { isCommon: false, event: specialEvent, playerOrigin: playerBase };
 }
 
-function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean): GenericEvent {
+function killPlayer(playerBase: Player, playersList: Player[], isDay: boolean): GenericEvent {
+    let playersDisp = playersList.filter((current) => current != playerBase && current.live);
+    let r = Math.floor(Math.random() * playersDisp.length);
+    let target = playersDisp[r];
+    target.Death();
+    let message = `${playerBase.name} mato a ${target.name}`;
+    let specialEvent: SpecialEvent = {
+        message: message,
+        eventType: eventType.KILL,
+        players: [playerBase],
+        victims: [target]
+    }
+    return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
+}
+
+function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean, isDay: boolean): GenericEvent {
     const playersOk = playersList.filter(current =>
         current.live && current !== playerBase && !current.amigo
     );
@@ -139,7 +159,7 @@ function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean):
         }
     } else {
         console.warn("No hay jugadores válidos disponibles.");
-        return farmCasual(playerBase);
+        return farmCasual(playerBase, isDay);
     }
 }
 
@@ -171,7 +191,7 @@ function revivePlayer(playerBase: Player): GenericEvent {
     return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
 }
 
-// --------------- MATAR A UN JUGADOR ---------------
+
 
 // ------ Eventos Comunes ------ //
 const commonEventsProb = {
@@ -180,44 +200,7 @@ const commonEventsProb = {
     good: 33.4
 }
 
-interface commonEventEntity {
-    message: string,
-    strength: number,
-    health: number,
-    luck: number
-}
-const neutralCommonList: Array<commonEventEntity> = [
-    { message: 'evento comun', strength: 0, health: 0, luck: 0 },
-    { message: 'evento comun1', strength: 0, health: 0, luck: 0 },
-    { message: 'evento comun2', strength: 0, health: 0, luck: 0 },
-    { message: 'evento comun3', strength: 0, health: 0, luck: 0 },
-    { message: 'evento comun4', strength: 0, health: 0, luck: 0 },
-    { message: 'evento comun5', strength: 0, health: 0, luck: 0 },
-    { message: 'evento comun6', strength: 0, health: 0, luck: 0 },
-    { message: 'evento comun7', strength: 0, health: 0, luck: 0 },
-]
-const goodCommonList: Array<commonEventEntity> = [
-    { message: 'buen evento', strength: 40, health: 10, luck: 0 },
-    { message: 'buen evento1', strength: 40, health: 10, luck: 0 },
-    { message: 'buen evento2', strength: 40, health: 10, luck: 0 },
-    { message: 'buen evento3', strength: 40, health: 10, luck: 0 },
-    { message: 'buen evento4', strength: 40, health: 10, luck: 0 },
-    { message: 'buen evento5', strength: 40, health: 10, luck: 0 },
-    { message: 'buen evento6', strength: 40, health: 10, luck: 0 },
-    { message: 'buen evento7', strength: 40, health: 10, luck: 0 },
-]
-const badCommonList: Array<commonEventEntity> = [
-    { message: 'evento malo', strength: -10, health: -5, luck: -25 },
-    { message: 'evento malo1', strength: -10, health: -5, luck: -25 },
-    { message: 'evento malo2', strength: -10, health: -5, luck: -25 },
-    { message: 'evento malo3', strength: -10, health: -5, luck: -25 },
-    { message: 'evento malo4', strength: -10, health: -5, luck: -25 },
-    { message: 'evento malo5', strength: -10, health: -5, luck: -25 },
-    { message: 'evento malo6', strength: -10, health: -5, luck: -25 },
-    { message: 'evento malo7', strength: -10, health: -5, luck: -25 },
-]
-
-function farmCasual(playerBase: Player): GenericEvent {
+function farmCasual(playerBase: Player, isDay: boolean): GenericEvent {
     const tempEventsProb = { ...commonEventsProb };
     if (playerBase.suerte < 30) {
         if (playerBase.suerte < 20) {
@@ -301,7 +284,7 @@ function farmCasual(playerBase: Player): GenericEvent {
     };
 }
 
-function farmWeapon(playerBase: Player, playersList: Player[]): GenericEvent {
+function farmWeapon(playerBase: Player, playersList: Player[], isDay: boolean): GenericEvent {
     const message = `${playerBase.name} obtuvo un arma casual`;
     let commonEvent: CommonEvent = {
         message,
@@ -311,7 +294,7 @@ function farmWeapon(playerBase: Player, playersList: Player[]): GenericEvent {
     return { isCommon: true, event: commonEvent, playerOrigin: playerBase };
 }
 
-function farmBigWeapon(playerBase: Player, playersList: Player[]): GenericEvent {
+function farmBigWeapon(playerBase: Player, playersList: Player[], isDay: boolean): GenericEvent {
     const message = `${playerBase.name} obtuvo un arma grande`;
     let commonEvent: CommonEvent = {
         message,

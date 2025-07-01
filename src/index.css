@@ -1,7 +1,10 @@
 @import 'tailwindcss';
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Raleway", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
@@ -11,14 +14,14 @@ html {
   font-size: 12px;
 }
 
-@media (max-width:720px){
-  html{
+@media (max-width:720px) {
+  html {
     font-size: 10px;
   }
 }
 
-@media (min-width:1024px){
-  html{
+@media (min-width:1024px) {
+  html {
     font-size: 14px;
   }
 }

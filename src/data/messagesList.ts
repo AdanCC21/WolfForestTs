@@ -1,3 +1,10 @@
+export interface commonEventEntity {
+    message: string,
+    strength: number,
+    health: number,
+    luck: number
+}
+
 export const deathMessagesDay = [
     { message: 'intentó disparar un arma defectuosa, explotando el cañón de esta misma en su cara.', strength: -9, health: -4, luck: -22.5 },
     { message: 'al querer probar un arma la disparó al cielo, la bala cayó en su cabeza, qué mala suerte.', strength: -10, health: -5, luck: -25 },
@@ -76,7 +83,7 @@ export const deathMessagesNight = [
 
 // ---------------------------
 
-export const neutralCommonEventsDay = [
+export const neutralCommonEventsDay:Array<commonEventEntity> = [
     { message: 'recolectó bayas y frutos del bosque.', strength: 0, health: 0, luck: 0 },
     { message: 'se movió hacia una nueva zona para explorar.', strength: 0, health: 0, luck: 0 },
     { message: 'avistó a otro competidor, pero decidió mantenerse oculto.', strength: 0, health: 0, luck: 0 },
@@ -94,7 +101,7 @@ export const neutralCommonEventsDay = [
     { message: 'encontró un refugio natural entre las rocas para descansar un rato.', strength: 0, health: 0, luck: 0 },
 ];
 
-export const negativeCommonEventsDay = [
+export const negativeCommonEventsDay:Array<commonEventEntity> = [
     { message: 'se lastimo al buscar frutos en los arbustos.', strength: 0, health: -0.5, luck: 0 },
     { message: 'fue atacado por un lobo, sobrevivio pero le dejo el brazo sangrando, debera atender sus heridas y cuidarse de la manada de lobos.', strength: -1.5, health: -1.5, luck: 0 },
     { message: 'cayó de un arbol muy alto, se quebro una pierna.', strength: -2, health: -2, luck: 0 },
@@ -112,7 +119,7 @@ export const negativeCommonEventsDay = [
     { message: 'sufrió un ataque de fiebre debido a la exposición prolongada al frío, esto le afectara mas adelante.', strength: -2, health: -4, luck: 0 }
 ]
 
-export const positiveCommonEventsDay = [
+export const positiveCommonEventsDay:Array<commonEventEntity> = [
     { message: 'construyó una pequeña trampa para animales.', strength: 1, health: 1, luck: 0 },
     { message: 'practica su punteria', strength: 1, health: 1, luck: 0 },
     { message: 'encontró un refugio seguro y lo mejoró con ramas y hojas.', strength: 1, health: 1, luck: 0 },
@@ -126,7 +133,7 @@ export const positiveCommonEventsDay = [
 ];
 
 // ---------------------------
-export const neutralCommonEventsNight = [
+export const neutralCommonEventsNight:Array<commonEventEntity> = [
   { message: "encontró un lugar seguro para pasar la noche.", strength: 0, health: 0, luck: 0 },
   { message: "escuchó ruidos extraños, pero decidió no investigar.", strength: 0, health: 0, luck: 0 },
   { message: "reforzó su refugio con ramas y piedras.", strength: 0, health: 0, luck: 0 },
@@ -148,7 +155,7 @@ export const neutralCommonEventsNight = [
   { message: "fabricó una antorcha improvisada para iluminar su camino.", strength: 0, health: 0, luck: 0 }
 ];
 
-export const negativeCommonEventsNight = [
+export const negativeCommonEventsNight:Array<commonEventEntity> = [
   { message: "decidió mantenerse despierto toda la noche por precaución.", strength: 0, health: -1, luck: 0 },
   { message: "no pudo dormir por un ataque de ansiedad.", strength: 0, health: -1, luck: 0 },
   { message: "no pudo dormir por el miedo a los lobos.", strength: 0, health: -1, luck: 0 },
@@ -164,7 +171,7 @@ export const negativeCommonEventsNight = [
   { message: "se deshidrató al no encontrar agua durante la noche.", strength: -1, health: -3, luck: 0 }
 ];
 
-export const positiveCommonEventsNight = [
+export const positiveCommonEventsNight:Array<commonEventEntity> = [
   { message: "extraña a su familia...", strength: 2, health: 0, luck: 0 },
   { message: "descansó durante el resto de la noche.", strength: 1, health: 1, luck: 0 },
   { message: "encontró un refugio oculto que lo protegió durante toda la noche.", strength: 0, health: 2, luck: 0 },
