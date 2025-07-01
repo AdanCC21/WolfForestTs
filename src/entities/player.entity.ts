@@ -1,4 +1,4 @@
-import { CommonEvent } from "./events.entity";
+import { CommonEvent, EventMessage } from "./events.entity";
 import { Arma } from "./weapon.entity";
 
 export type newPlayer = {
@@ -64,6 +64,17 @@ export class Player {
         this.fuerza += event.fuerza;
         this.vida += event.vida;
         this.suerte += event.suerte;
+    }
+    
+    public UpdateAttributesByMessage(event: EventMessage) {
+        this.fuerza += event.strength;
+        this.vida += event.heal;
+        this.suerte += event.luck;
+    }
+
+    public SetWeapon(event: EventMessage, weapon: Arma) {
+        this.arma = weapon;
+        this.UpdateAttributesByMessage(event);
     }
 
     static fromJSON(json: any): Player {

@@ -32,3 +32,9 @@ export type SpecialEvent = {
     victims: Array<Player>
 }
 
+export interface EventMessage {
+    messages: string[],
+    strength: number
+    heal: number
+    luck: number
+}

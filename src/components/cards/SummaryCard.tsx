@@ -11,18 +11,18 @@ export default function SummaryCard({ player }: Prompts) {
                 <img className={`${!player.live ? 'grayscale' : ''} rounded-md z-1`}
                     src={player.image} alt={player.name} />
                 {player.amigo ? (
-                    <div className='group absolute left-[-10px] top-[-10px]'>
+                    <div className='group absolute left-[-10px] top-[-10px] max-w-1/2 flex'>
                         <img
-                            className={`${!player.live ? 'grayscale' : ''} rounded-full w-10 z-2`}
+                            className={`${!player.amigo.live ? 'grayscale' : ''} rounded-full w-10 h-fit z-2`}
                             src={player.amigo.image}
                             alt={player.amigo.name}
                         />
                         <img
-                            className={`${!player.live ? 'grayscale' : ''} rounded-full w-5 absolute top-0 z-3`}
+                            className="rounded-full w-5 absolute top-0 h-fit z-3"
                             src='/eventIcons/handsShake.png'
-                            alt={player.amigo.name}
+                            alt='hands shake'
                         />
-                        <span className='ml-1 bg-[rgba(0,0,0,0.5)] px-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                        <span className='ml-1 z-10 bg-[rgba(0,0,0,0.5)] px-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
                             {player.amigo.name}
                         </span>
                     </div>
@@ -30,13 +30,33 @@ export default function SummaryCard({ player }: Prompts) {
                 ) : (<></>)}
 
                 {player.pareja ? (
-                    <div className='absolute right-[-10px] top-[-10px]'>
-                        <img className={`${!player.live ? 'grayscale' : ''} 
-                        rounded-full ] w-10 z-2`}
-                            src={player.pareja.image} alt={player.pareja.name} />
-                        <img className={`${!player.live ? 'grayscale' : ''} 
-                        rounded-full w-5 absolute top-0 right-0 z-3`}
-                            src='/eventIcons/heart.png' alt={player.pareja.name} />
+                    <div className='group flex flex-row-reverse absolute max-w-1/2 right-[-10px] top-[-10px]'>
+                        <img
+                            className={`${!player.pareja.live ? 'grayscale' : ''} rounded-full w-10 h-fit z-2`}
+                            src={player.pareja.image}
+                            alt={player.pareja.name}
+                        />
+                        <img
+                            className="rounded-full w-5 h-fit absolute top-0 z-3"
+                            src='/eventIcons/heart.png'
+                            alt='heart'
+                        />
+                        <span className='ml-1 z-10 bg-[rgba(0,0,0,0.5)] px-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                            {player.pareja.name}
+                        </span>
+                    </div>
+                ) : (<></>)}
+
+                {player.arma ? (
+                    <div className='group absolute flex left-[-10px] bottom-[-20px]'>
+                        <img
+                            className="rounded-full w-5 h-fit z-3"
+                            src='/eventIcons/gun.png'
+                            alt='heart'
+                        />
+                        <span className='ml-1 z-10 bg-[rgba(0,0,0,0.5)] px-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                            {player.arma.name}
+                        </span>
                     </div>
                 ) : (<></>)}
             </div>

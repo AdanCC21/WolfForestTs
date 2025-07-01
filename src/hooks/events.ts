@@ -1,5 +1,11 @@
 import { Player } from "../entities/player.entity";
-import { CommonEvent, eventType, GenericEvent, SpecialEvent } from "../entities/events.entity";
+import { CommonEvent, EventMessage, eventType, GenericEvent, SpecialEvent } from "../entities/events.entity";
+import { deathMessagesDay, deathMessagesNight } from "../data/deathMessages";
+import { farmArrowMessages, farmAxeMessages, farmPistolMessages, farmRazorMessages, farmRifleMessages, negativeCommonEventsDay, negativeCommonEventsNight, neutralCommonEventsDay, neutralCommonEventsNight, positiveCommonEventsDay, positiveCommonEventsNight } from "../data/farmMessages";
+import { Arco, Hacha, Navaja, Pistola, Rifle } from "../entities/weapon.entity";
+import { DuoMessagesList, RelationMessagesList } from "../data/friendRelationMessages";
+import { ReviveMessageList } from "../data/healReviveMessages";
+import { KillMessageList } from "../data/killMessages";
 function randomNumber(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -56,7 +62,7 @@ export function useGetEvents(dayNumber: number, playersList: Array<Player>) {
         })
     }
 }
-// lista de eventos
+
 function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Player>, isDay: boolean): GenericEvent {
     let luckEvent = randomNumber(0, 100);
     if (currentPlayer.live) {
@@ -92,12 +98,28 @@ function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Pl
     }
 }
 
-// Matar a un jugador por un evento natural
+function getMessage(list: Array<EventMessage>, playerBase: Player, otherPlayer?: Player) {
+    let r = Math.floor(Math.random() * list.length);
+    let event = list[r];
+    let message = '';
+    if (otherPlayer) {
+        message = playerBase.name + " " + event.messages[0] + otherPlayer.name + " " + event.messages[1];
+    } else {
+        message = playerBase.name + " " + event.messages[0];
+    }
+    return { event: event, finalMessage: message }
+}
+
+// * ---------------- ---------------- MANEJO DE EVENTOS ---------------- ---------------- * //
+
 function playerDeath(playerBase: Player, isDay: boolean): GenericEvent {
-    const message = `${playerBase.name} murió por pendejo`;
+    let { event, finalMessage } = getMessage(isDay ? deathMessagesDay : deathMessagesNight, playerBase);
+
     playerBase.Death();
+    playerBase.UpdateAttributesByMessage(event);
+
     let specialEvent: SpecialEvent = {
-        message: message,
+        message: finalMessage,
         eventType: eventType.DEATH,
         players: [playerBase],
         victims: []
@@ -105,14 +127,19 @@ function playerDeath(playerBase: Player, isDay: boolean): GenericEvent {
     return { isCommon: false, event: specialEvent, playerOrigin: playerBase };
 }
 
+// * : Falta matar por arma, matar de 1 a muchos, de muchos a muchos
 function killPlayer(playerBase: Player, playersList: Player[], isDay: boolean): GenericEvent {
     let playersDisp = playersList.filter((current) => current != playerBase && current.live);
+
     let r = Math.floor(Math.random() * playersDisp.length);
     let target = playersDisp[r];
     target.Death();
-    let message = `${playerBase.name} mato a ${target.name}`;
+
+    const { event, finalMessage } = getMessage(KillMessageList, playerBase, target);
+    playerBase.UpdateAttributesByMessage(event);
+
     let specialEvent: SpecialEvent = {
-        message: message,
+        message: finalMessage,
         eventType: eventType.KILL,
         players: [playerBase],
         victims: [target]
@@ -132,24 +159,32 @@ function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean, 
         otherPlayer = playersOk[randomNumber];
 
         if (isDuo) {
-            otherPlayer.SetFriend(playerBase);
-            playerBase.SetFriend(otherPlayer);
+            const { event, finalMessage } = getMessage(DuoMessagesList, playerBase, otherPlayer);
 
-            const message = `${playerBase.name} se unió con ${otherPlayer.name}`;
+            playerBase.SetFriend(otherPlayer);
+            otherPlayer.SetFriend(playerBase);
+
+            playerBase.UpdateAttributesByMessage(event);
+            otherPlayer.UpdateAttributesByMessage(event);
+
             let specialEvent: SpecialEvent = {
-                message: message,
+                message: finalMessage,
                 eventType: eventType.DUO,
                 players: [playerBase],
                 victims: [otherPlayer],
             }
             return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
         } else {
-            otherPlayer.SetRelation(playerBase);
-            playerBase.SetRelation(otherPlayer);
+            const { event, finalMessage } = getMessage(RelationMessagesList, playerBase, otherPlayer);
 
-            const message = `${playerBase.name} se unió en una relacion con ${otherPlayer.name}`;
+            playerBase.SetRelation(otherPlayer);
+            otherPlayer.SetRelation(playerBase);
+
+            playerBase.UpdateAttributesByMessage(event);
+            otherPlayer.UpdateAttributesByMessage(event);
+
             let specialEvent: SpecialEvent = {
-                message: message,
+                message: finalMessage,
                 eventType: eventType.RELATION,
                 players: [playerBase],
                 victims: [otherPlayer],
@@ -178,11 +213,11 @@ function heal(playerBase: Player): GenericEvent {
 }
 
 function revivePlayer(playerBase: Player): GenericEvent {
+    const { finalMessage } = getMessage(ReviveMessageList, playerBase);
     playerBase.Revive();
-    const message = `${playerBase.name} ¡SE PARÓ, SE PARÓ, SE PARÓ!`;
 
     let specialEvent: SpecialEvent = {
-        message: message,
+        message: finalMessage,
         eventType: eventType.REVIVE,
         players: [playerBase],
         victims: []
@@ -190,8 +225,6 @@ function revivePlayer(playerBase: Player): GenericEvent {
 
     return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
 }
-
-
 
 // ------ Eventos Comunes ------ //
 const commonEventsProb = {
@@ -243,35 +276,37 @@ function farmCasual(playerBase: Player, isDay: boolean): GenericEvent {
     tempEventsProb.good = tempEventsProb.neutral + tempEventsProb.good;
 
     let r = Math.floor((Math.random() * 100) + 1);
-    let message = "";
     let commonEvent: CommonEvent;
 
     if (r < tempEventsProb.bad) {
-        message = `${playerBase.name} evento malo`;
+        let { event, finalMessage } = getMessage(isDay ? negativeCommonEventsDay : negativeCommonEventsNight, playerBase)
+
         commonEvent = {
-            message,
+            message: finalMessage,
             player: playerBase,
-            fuerza: -10,
-            vida: -5,
-            suerte: -5
+            fuerza: event.strength,
+            vida: event.heal,
+            suerte: event.luck
         };
     } else if (r < tempEventsProb.neutral) {
-        message = `${playerBase.name} evento neutral`;
+        let { event, finalMessage } = getMessage(isDay ? neutralCommonEventsDay : neutralCommonEventsNight, playerBase)
+
         commonEvent = {
-            message,
+            message: finalMessage,
             player: playerBase,
-            fuerza: 0,
-            vida: 0,
-            suerte: 0
+            fuerza: event.strength,
+            vida: event.heal,
+            suerte: event.luck
         };
     } else {
-        message = `${playerBase.name} evento bueno`;
+        let { event, finalMessage } = getMessage(isDay ? positiveCommonEventsDay : positiveCommonEventsNight, playerBase)
+
         commonEvent = {
-            message,
+            message: finalMessage,
             player: playerBase,
-            fuerza: +10,
-            vida: +5,
-            suerte: 0
+            fuerza: event.strength,
+            vida: event.heal,
+            suerte: event.luck
         };
     }
 
@@ -285,9 +320,27 @@ function farmCasual(playerBase: Player, isDay: boolean): GenericEvent {
 }
 
 function farmWeapon(playerBase: Player, playersList: Player[], isDay: boolean): GenericEvent {
-    const message = `${playerBase.name} obtuvo un arma casual`;
+    const opciones = [farmRazorMessages, farmArrowMessages, farmAxeMessages];
+    let r = Math.floor(Math.random() * opciones.length)
+    const lista = opciones[r];
+
+    let { event, finalMessage } = getMessage(lista, playerBase)
+    playerBase.SetWeapon(event, new Arco())
+
+    switch (r) {
+        case 0:
+            playerBase.SetWeapon(event, new Navaja());
+            break;
+        case 1:
+            playerBase.SetWeapon(event, new Arco());
+            break;
+        case 1:
+            playerBase.SetWeapon(event, new Hacha());
+            break;
+    }
+
     let commonEvent: CommonEvent = {
-        message,
+        message: finalMessage,
         player: playerBase,
         fuerza: 0, vida: 0, suerte: 0
     };
@@ -295,9 +348,22 @@ function farmWeapon(playerBase: Player, playersList: Player[], isDay: boolean): 
 }
 
 function farmBigWeapon(playerBase: Player, playersList: Player[], isDay: boolean): GenericEvent {
-    const message = `${playerBase.name} obtuvo un arma grande`;
+    const opciones = [farmPistolMessages, farmRifleMessages];
+    let r = Math.floor(Math.random() * opciones.length);
+    const lista = opciones[r];
+
+    let { event, finalMessage } = getMessage(lista, playerBase)
+    switch (r) {
+        case 0:
+            playerBase.SetWeapon(event, new Pistola());
+            break;
+        case 1:
+            playerBase.SetWeapon(event, new Rifle());
+            break;
+    }
+
     let commonEvent: CommonEvent = {
-        message,
+        message: finalMessage,
         player: playerBase,
         fuerza: 0, vida: 0, suerte: 0
     };

@@ -1,6 +1,6 @@
-import { SpecialEventMessage } from "./friendRelationMessages";
+import { EventMessage } from "../entities/events.entity";
 
-export const deathMessagesDay: SpecialEventMessage[] = [
+export const deathMessagesDay: EventMessage[] = [
     { messages: ['intentó disparar un arma defectuosa, explotando el cañón de esta misma en su cara.'], strength: -9, heal: -4, luck: -22.5 },
     { messages: ['al querer probar un arma la disparó al cielo, la bala cayó en su cabeza, qué mala suerte.'], strength: -10, heal: -5, luck: -25 },
     { messages: ['se enterró un cuchillo en el pecho al tropezar mientras huía de una manada de lobos.'], strength: -10, heal: -5, luck: -25 },
@@ -40,7 +40,7 @@ export const deathMessagesDay: SpecialEventMessage[] = [
 ];
 
 
-export const deathMessagesNight: SpecialEventMessage[] = [
+export const deathMessagesNight: EventMessage[] = [
     { messages: ['intentó disparar un arma defectuosa, explotando el cañón de esta misma en su cara.'], strength: -9, heal: -4, luck: -22.5 },
     { messages: ['al querer probar un arma la disparó al cielo, la bala cayó en su cabeza, qué mala suerte.'], strength: -10, heal: -5, luck: -25 },
     { messages: ['se enterró un cuchillo en el pecho al tropezar mientras huía de una manada de lobos.'], strength: -10, heal: -5, luck: -25 },

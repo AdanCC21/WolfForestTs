@@ -82,7 +82,7 @@ export default function EspecialEvent({ events, whenFinish }: Prompts) {
           <img src={`eventIcons/${handleIcon()}`}
             className="absolute -top-10 left-1/2 translate-x-[-50%] w-fit h-20"/>
         </div>
-        <h4 className="text-lg my-auto font-bold">{currentEvent.message}</h4>
+        <h4 className="text-lg my-auto">{currentEvent.message}</h4>
       </article>
     )
   }
