@@ -12,30 +12,30 @@ export class Arma {
 
 export class Navaja extends Arma {
     constructor() {
-        super('Navaja', 20, false);
+        super('Navaja', 10, false);
     }
 }
 
 export class Arco extends Arma {
     constructor() {
-        super('Arco', 60, false);
+        super('Arco', 25, false);
     }
 }
 
 export class Hacha extends Arma {
     constructor() {
-        super('Hacha', 40, true);
+        super('Hacha', 30, true);
     }
 }
 
 export class Pistola extends Arma {
     constructor() {
-        super('Pistola', 80, true);
+        super('Pistola', 40, true);
     }
 }
 
 export class Rifle extends Arma {
     constructor() {
-        super('Rifle', 80, true);
+        super('Rifle', 50, true);
     }
 }

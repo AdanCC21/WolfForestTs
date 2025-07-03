@@ -37,7 +37,6 @@ export class Player {
     }
 
     public Death(): void {
-        this.vida = 0;
         this.live = false;
     }
 

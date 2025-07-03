@@ -127,14 +127,163 @@ function playerDeath(playerBase: Player, isDay: boolean): GenericEvent {
     return { isCommon: false, event: specialEvent, playerOrigin: playerBase };
 }
 
+
 // * : Falta matar por arma, matar de 1 a muchos, de muchos a muchos
 function killPlayer(playerBase: Player, playersList: Player[], isDay: boolean): GenericEvent {
-    let playersDisp = playersList.filter((current) => current != playerBase && current.live);
+    const playersDisp = playersList.filter((current) => current != playerBase && current.live);
+    const target = playersDisp[Math.floor(Math.random() * playersDisp.length)];
 
-    let r = Math.floor(Math.random() * playersDisp.length);
-    let target = playersDisp[r];
-    target.Death();
+    let pbPlayer = 50;
+    let pbTarget = 50;
 
+    console.log("----------- KILL -----------")
+    console.log(playerBase)
+    console.log(target);
+
+    // Atributos
+    if (playerBase.fuerza > target.fuerza) {
+        pbPlayer += playerBase.fuerza - target.fuerza;
+        if (pbPlayer > 100) {
+            pbPlayer = 100;
+        }
+        pbTarget = 100 - pbPlayer;
+    } else {
+        if (playerBase.fuerza < target.fuerza) {
+            pbTarget += target.fuerza - playerBase.fuerza;
+            if (pbTarget > 100) {
+                pbTarget = 100;
+            }
+            pbPlayer = 100 - pbTarget;
+        }
+    }
+
+    console.log('----- fuerza ------')
+    console.log(pbPlayer,pbTarget);
+
+    if (playerBase.suerte > target.suerte) {
+        pbPlayer += playerBase.suerte - target.suerte;
+        if (pbPlayer > 100) {
+            pbPlayer = 100;
+        }
+        pbTarget = 100 - pbPlayer;
+    } else {
+        if (playerBase.suerte < target.suerte) {
+            pbTarget += target.suerte - playerBase.suerte;
+            if (pbTarget > 100) {
+                pbTarget = 100;
+            }
+            pbPlayer = 100 - pbTarget;
+        }
+    }
+
+    console.log('----- suerte ------')
+    console.log(pbPlayer,pbTarget);
+
+    if (playerBase.vida > target.vida) {
+        pbPlayer += playerBase.vida - target.vida;
+        if (pbPlayer > 100) {
+            pbPlayer = 100;
+        }
+        pbTarget = 100 - pbPlayer;
+    } else {
+        if (playerBase.vida < target.vida) {
+            pbTarget += target.vida - playerBase.vida;
+            if (pbTarget > 100) {
+                pbTarget = 100;
+            }
+            pbPlayer = 100 - pbTarget;
+        }
+    }
+
+    console.log('----- vida ------')
+    console.log(pbPlayer,pbTarget);
+
+    // Armas
+    if (playerBase.arma) {
+        pbPlayer += playerBase.arma.power;
+        if (pbPlayer > 100) {
+            pbPlayer = 100;
+        }
+        pbTarget = 100 - pbPlayer;
+    }
+    if (target.arma) {
+        pbTarget += target.arma.power;
+        if (pbTarget > 100) {
+            pbTarget = 100;
+        }
+        pbPlayer = 100 - pbTarget;
+    }
+
+    console.log('----- arma ------')
+    console.log(pbPlayer,pbTarget);
+
+    if (playerBase.amigo && playerBase.amigo.live) {
+        if (target.amigo && target.amigo.live) {
+            // se anulan
+        } else {
+            // sube la prob de playerBase
+            pbPlayer += 15
+            if (pbPlayer > 100) {
+                pbPlayer = 100
+            }
+            pbTarget = 100 - pbPlayer;
+        }
+    } else {
+        // pb no tiene amigo
+        if (target.amigo && target.amigo.live) {
+            // sube la prob de target
+            pbTarget += 15
+            if (pbTarget > 100) {
+                pbTarget = 100
+            }
+            pbPlayer = 100 - pbTarget;
+        }
+        // se anula si no tiene
+    }
+    console.log('----- amigos ------')
+    console.log(pbPlayer,pbTarget);
+
+    if (playerBase.pareja && playerBase.pareja.live) {
+        if (target.pareja && target.pareja.live) {
+            // se anulan
+        } else {
+            // sube la prob de playerBase
+            pbPlayer += 20
+            if (pbPlayer > 100) {
+                pbPlayer = 100
+            }
+            pbTarget = 100 - pbPlayer;
+        }
+    } else {
+        // pb no tiene pareja
+        if (target.pareja && target.pareja.live) {
+            // sube la prob de target
+            pbTarget += 20
+            if (pbTarget > 100) {
+                pbTarget = 100
+            }
+            pbPlayer = 100 - pbTarget;
+        }
+        // se anula si no tiene
+    }
+
+    console.log('----- pareja ------')
+    console.log(pbPlayer,pbTarget);
+
+    // deasde pbplayer hasta 100
+    pbTarget += pbPlayer;
+    let finalProb = Math.floor(Math.random() * 100);
+    
+    console.log('----- sumatoria ------')
+    console.log(pbPlayer,pbTarget, finalProb);
+    
+    if (finalProb <= pbPlayer){
+        //gano playerBase
+        target.Death();
+    }else{
+        // gano target
+        playerBase.Death();
+    }
     const { event, finalMessage } = getMessage(KillMessageList, playerBase, target);
     playerBase.UpdateAttributesByMessage(event);
 
