@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import './App.css'
 import Welcome from './pages/Welcome'
 import SetPlayers from './pages/SetPlayers'
 import Game from './pages/Game'

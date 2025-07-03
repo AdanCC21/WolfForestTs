@@ -48,7 +48,7 @@ export default function SetPlayers() {
 
 
     return (
-        <div className="flex flex-col justify-between min-h-screen overflow-x-hidden">
+        <div className="flex flex-col justify-between min-h-screen overflow-x-hidden bg-default">
             <header className="w-screen flex flex-col items-center my-5">
                 <h1>Jugadores</h1>
                 <p>Players Number : {players.length}</p>
@@ -63,10 +63,10 @@ export default function SetPlayers() {
                             <div className="my-2 w-full">
                                 <input placeholder="Image Url" value={current.image} name="image"
                                     onChange={(e) => { handleChange(e, current) }}
-                                    className="my-1 bg-black rounded-lg px-2 py-1 w-full overflow-ellipsis" />
+                                    className=" overflow-ellipsis" />
                                 <input placeholder="Image Url" value={current.name} name="name"
                                     onChange={(e) => { handleChange(e, current) }}
-                                    className="my-1 bg-black rounded-lg px-2 py-1 w-full overflow-ellipsis" />
+                                    className="  overflow-ellipsis" />
                             </div>
                             <button>Delete</button>
                         </article>
