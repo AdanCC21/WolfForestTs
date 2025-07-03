@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { eventType, SpecialEvent } from "../entities/events.entity"
 import { useState } from "react";
 
@@ -42,48 +43,65 @@ export default function EspecialEvent({ events, whenFinish }: Prompts) {
   }
 
   const multiplePlayers = () => {
-    return (<article key={currentIndex} className="flex">
-      <section className={`grid ${currentEvent.players.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
-        {currentEvent.players.map((current) => (
-          <figure key={current.id}>
-            <img src={current.image} alt={current.name}
-              className="w-fit h-50 rounded-md object-cover mx-auto mb-4"
-            />
-            <figcaption className="text-center">{current.name}</figcaption>
-          </figure>
-        ))}
-      </section>
-      <div className="flex flex-col h-full">
-        <img src={`eventIcons/${handleIcon()}`} className="w-fit h-20 mx-auto mb-2" />
-        <h3 className="text-lg my-auto mx-5">{currentEvent.message}</h3>
-      </div>
+    return (
+      <AnimatePresence mode="wait">
+        <motion.article
+          key={currentIndex}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="flex">
+          <section className={`grid ${currentEvent.players.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
+            {currentEvent.players.map((current) => (
+              <figure key={current.id}>
+                <img src={current.image} alt={current.name}
+                  className="w-fit h-50 rounded-md object-cover mx-auto mb-4"
+                />
+                <figcaption className="text-center">{current.name}</figcaption>
+              </figure>
+            ))}
+          </section>
+          <div className="flex flex-col h-full">
+            <img src={`eventIcons/${handleIcon()}`} className="w-fit h-20 mx-auto mb-2" />
+            <h3 className="text-lg my-auto mx-5">{currentEvent.message}</h3>
+          </div>
 
-      <section className={`grid ${currentEvent.victims.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
-        {currentEvent.victims.map((current) => (
-          <figure key={current.id} className="self-center">
-            <img src={current.image} alt={current.name}
-              className="w-fit h-50 rounded-md object-cover mx-auto mb-4"
-            />
-            <figcaption className="text-center">{current.name}</figcaption>
-          </figure>
-        ))}
-      </section>
-    </article>)
+          <section className={`grid ${currentEvent.victims.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
+            {currentEvent.victims.map((current) => (
+              <figure key={current.id} className="self-center">
+                <img src={current.image} alt={current.name}
+                  className="w-fit h-50 rounded-md object-cover mx-auto mb-4"
+                />
+                <figcaption className="text-center">{current.name}</figcaption>
+              </figure>
+            ))}
+          </section>
+        </motion.article>
+      </AnimatePresence>
+    )
   }
 
   const singlePlayer = () => {
     let player = currentEvent.players[0];
 
     return (
-      <article key={currentIndex} className="flex flex-col">
-        <div className="relative mb-5">
-          <img src={player.image} alt={player.name}
-            className="w-fit h-80 rounded-md object-cover mx-auto mb-4" />
-          <img src={`eventIcons/${handleIcon()}`}
-            className="absolute -top-10 left-1/2 translate-x-[-50%] w-fit h-20"/>
-        </div>
-        <h4 className="text-lg my-auto">{currentEvent.message}</h4>
-      </article>
+      <AnimatePresence mode="wait">
+        <motion.article
+          key={currentIndex}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex flex-col">
+          <div className="relative mb-5">
+            <img src={player.image} alt={player.name}
+              className="w-fit h-80 rounded-md object-cover mx-auto mb-4" />
+            <img src={`eventIcons/${handleIcon()}`}
+              className="absolute -top-10 left-1/2 translate-x-[-50%] w-fit h-20" />
+          </div>
+          <h4 className="text-lg my-auto">{currentEvent.message}</h4>
+        </motion.article>
+      </AnimatePresence>
     )
   }
 
@@ -97,8 +115,10 @@ export default function EspecialEvent({ events, whenFinish }: Prompts) {
         <>{singlePlayer()}</>
       )}
 
-      <button className="absolute bottom-1/10 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" onClick={handleNext} >
-        {isLastEvent ? "Finalizar" : "Siguiente"}
+      <button className="absolute bottom-1/10 px-6 py-2  transition" onClick={handleNext} >
+        <span>
+          {isLastEvent ? "Finalizar" : "Siguiente"}
+        </span>
       </button>
     </section>
   );

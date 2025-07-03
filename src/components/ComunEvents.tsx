@@ -1,6 +1,9 @@
 import { Player } from "../entities/player.entity"
 import { CommonEvent } from "../entities/events.entity"
 import CommondCard from "./cards/CommondCard"
+import { AnimatePresence, motion } from "framer-motion"
+import { useEffect, useState } from "react"
+import { ScrollFadeSection } from "./ScrollFadeSection"
 
 type Prompts = {
   day: number,
@@ -9,17 +12,59 @@ type Prompts = {
 }
 
 export default function ComunEvents({ day, events, playersBase }: Prompts) {
-  return (
-    <main className="flex flex-col">
-      <div className="flex flex-col w-screen min-h-[5vh] items-center my-3">
-        <h1>{day % 2 !== 0 ? 'Dia' : 'noche'} {day}</h1>
-      </div>
+  const [showDay, setShowDay] = useState(true);
 
-      {events.map((current, index) => (
-        <section key={index} className="flex flex-col mx-[10vw] items-center my-3">
-          <CommondCard key={index} eventPlayer={current.player} playerBase={playersBase[index]} message={current.message} />
-        </section>
-      ))}
-    </main>
+  useEffect(() => {
+    window.scrollTo(0,0)
+    const timer = setTimeout(() => {
+      setShowDay(false);
+    }, 900);
+    return () => clearTimeout(timer);
+  }, [])
+
+  return (
+    <AnimatePresence mode="wait">
+      {showDay && (
+        <motion.div
+          key='daynight'
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.3 }}
+          className="flex flex-col w-screen h-screen items-center justify-center"
+        >
+          <h1 style={{fontSize:'5rem'}}>Ronda {day}</h1>
+          <img src={day % 2 !== 0 ? 'eventIcons/sun.png' : 'eventIcons/moon.png'}
+            className="h-20" />
+
+        </motion.div>
+      )}
+
+      {!showDay && (
+        <motion.div
+          key='events'
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.3 }}>
+          <header className="flex justify-center items-center h-[10vh]">
+            <h3 className="mx-2">Ronda {day}</h3>
+            <img alt="day or night"
+              src={day % 2 !== 0 ? 'eventIcons/sun.png' : 'eventIcons/moon.png'}
+              className="h-2/4" />
+          </header>
+
+          {events.map((current, index) => (
+            <ScrollFadeSection key={index}>
+              <CommondCard
+                eventPlayer={current.player}
+                playerBase={playersBase[index]}
+                message={current.message}
+              />
+            </ScrollFadeSection>
+          ))}
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }

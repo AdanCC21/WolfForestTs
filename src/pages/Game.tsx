@@ -77,7 +77,11 @@ export default function Game() {
           {commonEvents ? (
             <>
               <ComunEvents day={dayCount} events={commonEvents} playersBase={players} />
-              <button className="w-fit mx-auto my-2" onClick={() => { setShowSpecial(true); setShowCommon(false); }}>Continuar</button>
+              <div className="h-[20vh] flex flex-col">
+                <button className="w-fit mx-auto my-auto" onClick={() => { setShowSpecial(true); setShowCommon(false); }}>
+                  <span>Continuar</span>
+                </button>
+              </div>
             </>
           ) : (
             <>

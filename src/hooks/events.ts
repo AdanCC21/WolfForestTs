@@ -114,7 +114,7 @@ function getKillMessage(list: Array<EventMessage>, playerBase: Player, otherPlay
     let r = Math.floor(Math.random() * list.length);
     let event = list[r];
     let message = '';
-    
+
     let targetNames = '';
     otherPlayers.forEach((current) => {
         targetNames += current.name + ' ';
@@ -148,6 +148,9 @@ function playerDeath(playerBase: Player, isDay: boolean): GenericEvent {
 
 
 // * : Falta mensajes de cuando es de 1 a 1, de 1 a muchos, de muchos a muchos, y cuando es por arma
+// ! : Mata a su compañero a veces, el aliado del ganador aparece en la derecha con los enemigos
+// ! : Adaptar los mensajes para que los jugadores aliados tambien se muestren a la izquierda
+// ! : En caso de que mate a su pareja o aliado, no meterlo el los ganadores
 function killPlayer(playerBase: Player, playersList: Player[]): GenericEvent {
     const playersDisp = playersList.filter((current) => current != playerBase && current.live);
     const target = playersDisp[Math.floor(Math.random() * playersDisp.length)];
@@ -220,52 +223,56 @@ function killPlayer(playerBase: Player, playersList: Player[]): GenericEvent {
         pbPlayer = 100 - pbTarget;
     }
 
-    if (playerBase.amigo && playerBase.amigo.live) {
-        if (target.amigo && target.amigo.live) {
-            // se anulan
+    if (playerBase.amigo && playerBase.amigo !== target) {
+        if (playerBase.amigo && playerBase.amigo.live) {
+            if (target.amigo && target.amigo.live) {
+                // se anulan
+            } else {
+                // sube la prob de playerBase
+                pbPlayer += 15
+                if (pbPlayer > 100) {
+                    pbPlayer = 100
+                }
+                pbTarget = 100 - pbPlayer;
+            }
         } else {
-            // sube la prob de playerBase
-            pbPlayer += 15
-            if (pbPlayer > 100) {
-                pbPlayer = 100
+            // pb no tiene amigo
+            if (target.amigo && target.amigo.live) {
+                // sube la prob de target
+                pbTarget += 15
+                if (pbTarget > 100) {
+                    pbTarget = 100
+                }
+                pbPlayer = 100 - pbTarget;
             }
-            pbTarget = 100 - pbPlayer;
+            // se anula si no tiene
         }
-    } else {
-        // pb no tiene amigo
-        if (target.amigo && target.amigo.live) {
-            // sube la prob de target
-            pbTarget += 15
-            if (pbTarget > 100) {
-                pbTarget = 100
-            }
-            pbPlayer = 100 - pbTarget;
-        }
-        // se anula si no tiene
     }
 
-    if (playerBase.pareja && playerBase.pareja.live) {
-        if (target.pareja && target.pareja.live) {
-            // se anulan
+    if (playerBase.pareja && playerBase.pareja !== target){
+        if (playerBase.pareja && playerBase.pareja.live) {
+            if (target.pareja && target.pareja.live) {
+                // se anulan
+            } else {
+                // sube la prob de playerBase
+                pbPlayer += 20
+                if (pbPlayer > 100) {
+                    pbPlayer = 100
+                }
+                pbTarget = 100 - pbPlayer;
+            }
         } else {
-            // sube la prob de playerBase
-            pbPlayer += 20
-            if (pbPlayer > 100) {
-                pbPlayer = 100
+            // pb no tiene pareja
+            if (target.pareja && target.pareja.live) {
+                // sube la prob de target
+                pbTarget += 20
+                if (pbTarget > 100) {
+                    pbTarget = 100
+                }
+                pbPlayer = 100 - pbTarget;
             }
-            pbTarget = 100 - pbPlayer;
+            // se anula si no tiene
         }
-    } else {
-        // pb no tiene pareja
-        if (target.pareja && target.pareja.live) {
-            // sube la prob de target
-            pbTarget += 20
-            if (pbTarget > 100) {
-                pbTarget = 100
-            }
-            pbPlayer = 100 - pbTarget;
-        }
-        // se anula si no tiene
     }
 
     // deasde pbplayer hasta 100
@@ -311,7 +318,7 @@ function killPlayer(playerBase: Player, playersList: Player[]): GenericEvent {
         if (playerBase.amigo) { playerBase.amigo.Death(); targets.push(playerBase.amigo) }
         if (playerBase.pareja) { playerBase.pareja.Death(); targets.push(playerBase.pareja) }
 
-        const { event, finalMessage } = getKillMessage(KillMessageList, target, targets);
+        const { event, finalMessage } = getKillMessage(KillMessageList, playerBase, targets);
         target.UpdateAttributesByMessage(event);
 
         if (target.amigo) { targets.push(target.amigo) }
