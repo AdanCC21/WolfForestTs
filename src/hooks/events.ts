@@ -12,13 +12,13 @@ function randomNumber(min: number, max: number): number {
 // 0 >= playerProb < eventProb
 const dayEventsList = {
     //0 -> 19
-    death: 15,
+    death: 10,
     //20 -> 34
-    kill: 25,
+    kill: 15,
     //35 -> 39
-    deal: 30,
+    deal: 25,
     // 40 -> 44
-    relation: 35,
+    relation: 30,
     //45 -> 79 (comida, refugio, caza etc)
     farmCasual: 75,
     // 80 -> 86 (Arco, Hacha)
@@ -32,13 +32,13 @@ const dayEventsList = {
 }
 const nightEventsList = {
     //0 -> 34
-    death: 35,
+    death: 15,
     //35 -> 49
-    kill: 50,
+    kill: 25,
     //50 -> 59
-    deal: 60,
+    deal: 35,
     // 60 -> 64
-    relation: 65,
+    relation: 45,
     //55 -> 79 (comida, refugio, caza etc)
     farmCasual: 80,
     // 80 -> 86 (Arco, Hacha)
@@ -52,7 +52,7 @@ const nightEventsList = {
 }
 
 export function useGetEvents(dayNumber: number, playersList: Array<Player>) {
-    if (dayNumber % 2 === 0) {
+    if (dayNumber % 2 !== 0) {
         return playersList.map((current) => {
             return getEvents(dayEventsList, current, playersList, true);
         })
@@ -249,7 +249,7 @@ function killPlayer(playerBase: Player, playersList: Player[]): GenericEvent {
         }
     }
 
-    if (playerBase.pareja && playerBase.pareja !== target){
+    if (playerBase.pareja && playerBase.pareja !== target) {
         if (playerBase.pareja && playerBase.pareja.live) {
             if (target.pareja && target.pareja.live) {
                 // se anulan
@@ -507,6 +507,7 @@ function farmCasual(playerBase: Player, isDay: boolean): GenericEvent {
     };
 }
 
+//! Validar si tiene un arma mejor no cambiarla, si ya tiene esa arma o una mejor ,cambiar aun evento comun
 function farmWeapon(playerBase: Player): GenericEvent {
     const opciones = [farmRazorMessages, farmArrowMessages, farmAxeMessages];
     let r = Math.floor(Math.random() * opciones.length)

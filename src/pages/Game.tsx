@@ -176,7 +176,7 @@ export default function Game() {
 
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden bg-default h-screen">
       {handleScreens()}
     </div >
   )
