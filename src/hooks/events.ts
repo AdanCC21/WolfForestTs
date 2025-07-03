@@ -12,17 +12,17 @@ function randomNumber(min: number, max: number): number {
 // 0 >= playerProb < eventProb
 const dayEventsList = {
     //0 -> 19
-    death: 20,
+    death: 15,
     //20 -> 34
-    kill: 35,
+    kill: 25,
     //35 -> 39
-    deal: 40,
+    deal: 30,
     // 40 -> 44
-    relation: 45,
+    relation: 35,
     //45 -> 79 (comida, refugio, caza etc)
-    farmCasual: 80,
+    farmCasual: 75,
     // 80 -> 86 (Arco, Hacha)
-    farmWeapon: 87,
+    farmWeapon: 85,
     //87-89 (Pistola, rifle)
     farmBigWeapon: 90,
     // 90 -> 97
@@ -68,7 +68,7 @@ function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Pl
     if (currentPlayer.live) {
         if (luckEvent < eventsList.death) return playerDeath(currentPlayer, isDay);
 
-        if (luckEvent < eventsList.kill) return killPlayer(currentPlayer, playersList, isDay);
+        if (luckEvent < eventsList.kill) return killPlayer(currentPlayer, playersList);
 
         if (luckEvent < eventsList.deal) return linkPlayers(currentPlayer, playersList, true, isDay);
 
@@ -76,9 +76,9 @@ function getEvents(eventsList: any, currentPlayer: Player, playersList: Array<Pl
 
         if (luckEvent < eventsList.farmCasual) return farmCasual(currentPlayer, isDay);
 
-        if (luckEvent < eventsList.farmWeapon) return farmWeapon(currentPlayer, playersList, isDay);
+        if (luckEvent < eventsList.farmWeapon) return farmWeapon(currentPlayer);
 
-        if (luckEvent < eventsList.farmBigWeapon) return farmBigWeapon(currentPlayer, playersList, isDay);
+        if (luckEvent < eventsList.farmBigWeapon) return farmBigWeapon(currentPlayer);
 
         if (luckEvent < eventsList.heal) {
             return heal(currentPlayer);
@@ -110,6 +110,25 @@ function getMessage(list: Array<EventMessage>, playerBase: Player, otherPlayer?:
     return { event: event, finalMessage: message }
 }
 
+function getKillMessage(list: Array<EventMessage>, playerBase: Player, otherPlayers: Array<Player>) {
+    let r = Math.floor(Math.random() * list.length);
+    let event = list[r];
+    let message = '';
+    
+    let targetNames = '';
+    otherPlayers.forEach((current) => {
+        targetNames += current.name + ' ';
+    })
+
+    let baseNames = playerBase.name;
+    if (playerBase.amigo) baseNames += playerBase.amigo.name;
+    if (playerBase.pareja) baseNames += playerBase.pareja.name;
+
+    message = baseNames + " " + event.messages[0] + targetNames + " " + event.messages[1];
+
+    return { event: event, finalMessage: message }
+}
+
 // * ---------------- ---------------- MANEJO DE EVENTOS ---------------- ---------------- * //
 
 function playerDeath(playerBase: Player, isDay: boolean): GenericEvent {
@@ -128,17 +147,13 @@ function playerDeath(playerBase: Player, isDay: boolean): GenericEvent {
 }
 
 
-// * : Falta matar por arma, matar de 1 a muchos, de muchos a muchos
-function killPlayer(playerBase: Player, playersList: Player[], isDay: boolean): GenericEvent {
+// * : Falta mensajes de cuando es de 1 a 1, de 1 a muchos, de muchos a muchos, y cuando es por arma
+function killPlayer(playerBase: Player, playersList: Player[]): GenericEvent {
     const playersDisp = playersList.filter((current) => current != playerBase && current.live);
     const target = playersDisp[Math.floor(Math.random() * playersDisp.length)];
 
     let pbPlayer = 50;
     let pbTarget = 50;
-
-    console.log("----------- KILL -----------")
-    console.log(playerBase)
-    console.log(target);
 
     // Atributos
     if (playerBase.fuerza > target.fuerza) {
@@ -157,9 +172,6 @@ function killPlayer(playerBase: Player, playersList: Player[], isDay: boolean): 
         }
     }
 
-    console.log('----- fuerza ------')
-    console.log(pbPlayer,pbTarget);
-
     if (playerBase.suerte > target.suerte) {
         pbPlayer += playerBase.suerte - target.suerte;
         if (pbPlayer > 100) {
@@ -175,9 +187,6 @@ function killPlayer(playerBase: Player, playersList: Player[], isDay: boolean): 
             pbPlayer = 100 - pbTarget;
         }
     }
-
-    console.log('----- suerte ------')
-    console.log(pbPlayer,pbTarget);
 
     if (playerBase.vida > target.vida) {
         pbPlayer += playerBase.vida - target.vida;
@@ -195,9 +204,6 @@ function killPlayer(playerBase: Player, playersList: Player[], isDay: boolean): 
         }
     }
 
-    console.log('----- vida ------')
-    console.log(pbPlayer,pbTarget);
-
     // Armas
     if (playerBase.arma) {
         pbPlayer += playerBase.arma.power;
@@ -213,9 +219,6 @@ function killPlayer(playerBase: Player, playersList: Player[], isDay: boolean): 
         }
         pbPlayer = 100 - pbTarget;
     }
-
-    console.log('----- arma ------')
-    console.log(pbPlayer,pbTarget);
 
     if (playerBase.amigo && playerBase.amigo.live) {
         if (target.amigo && target.amigo.live) {
@@ -240,8 +243,6 @@ function killPlayer(playerBase: Player, playersList: Player[], isDay: boolean): 
         }
         // se anula si no tiene
     }
-    console.log('----- amigos ------')
-    console.log(pbPlayer,pbTarget);
 
     if (playerBase.pareja && playerBase.pareja.live) {
         if (target.pareja && target.pareja.live) {
@@ -267,33 +268,64 @@ function killPlayer(playerBase: Player, playersList: Player[], isDay: boolean): 
         // se anula si no tiene
     }
 
-    console.log('----- pareja ------')
-    console.log(pbPlayer,pbTarget);
-
     // deasde pbplayer hasta 100
     pbTarget += pbPlayer;
     let finalProb = Math.floor(Math.random() * 100);
-    
-    console.log('----- sumatoria ------')
-    console.log(pbPlayer,pbTarget, finalProb);
-    
-    if (finalProb <= pbPlayer){
+
+    if (finalProb <= pbPlayer) {
         //gano playerBase
         target.Death();
-    }else{
+        const targets: Array<Player> = [];
+        targets.push(target);
+
+        const players: Array<Player> = [];
+        players.push(playerBase);
+
+        // mato a los perdedores
+        if (target.amigo) { target.amigo.Death(); targets.push(target.amigo) }
+        if (target.pareja) { target.pareja.Death(); targets.push(target.pareja) }
+
+        const { event, finalMessage } = getKillMessage(KillMessageList, playerBase, targets);
+
+        // actualizo y meto a el jugador base y sus amigos
+        playerBase.UpdateAttributesByMessage(event);
+        if (playerBase.amigo) { targets.push(playerBase.amigo) }
+        if (playerBase.pareja) { targets.push(playerBase.pareja) }
+
+        let specialEvent: SpecialEvent = {
+            message: finalMessage,
+            eventType: eventType.KILL,
+            players: players,
+            victims: targets
+        }
+        return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
+    } else {
         // gano target
         playerBase.Death();
-    }
-    const { event, finalMessage } = getMessage(KillMessageList, playerBase, target);
-    playerBase.UpdateAttributesByMessage(event);
+        const targets: Array<Player> = [];
+        targets.push(playerBase);
 
-    let specialEvent: SpecialEvent = {
-        message: finalMessage,
-        eventType: eventType.KILL,
-        players: [playerBase],
-        victims: [target]
+        const players: Array<Player> = [];
+        players.push(target);
+
+        if (playerBase.amigo) { playerBase.amigo.Death(); targets.push(playerBase.amigo) }
+        if (playerBase.pareja) { playerBase.pareja.Death(); targets.push(playerBase.pareja) }
+
+        const { event, finalMessage } = getKillMessage(KillMessageList, target, targets);
+        target.UpdateAttributesByMessage(event);
+
+        if (target.amigo) { targets.push(target.amigo) }
+        if (target.pareja) { targets.push(target.pareja) }
+
+        let specialEvent: SpecialEvent = {
+            message: finalMessage,
+            eventType: eventType.KILL,
+            players: players,
+            victims: targets
+        }
+        return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
     }
-    return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
+
 }
 
 function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean, isDay: boolean): GenericEvent {
@@ -468,7 +500,7 @@ function farmCasual(playerBase: Player, isDay: boolean): GenericEvent {
     };
 }
 
-function farmWeapon(playerBase: Player, playersList: Player[], isDay: boolean): GenericEvent {
+function farmWeapon(playerBase: Player): GenericEvent {
     const opciones = [farmRazorMessages, farmArrowMessages, farmAxeMessages];
     let r = Math.floor(Math.random() * opciones.length)
     const lista = opciones[r];
@@ -496,7 +528,7 @@ function farmWeapon(playerBase: Player, playersList: Player[], isDay: boolean): 
     return { isCommon: true, event: commonEvent, playerOrigin: playerBase };
 }
 
-function farmBigWeapon(playerBase: Player, playersList: Player[], isDay: boolean): GenericEvent {
+function farmBigWeapon(playerBase: Player): GenericEvent {
     const opciones = [farmPistolMessages, farmRifleMessages];
     let r = Math.floor(Math.random() * opciones.length);
     const lista = opciones[r];

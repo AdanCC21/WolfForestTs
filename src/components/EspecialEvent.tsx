@@ -87,6 +87,7 @@ export default function EspecialEvent({ events, whenFinish }: Prompts) {
     )
   }
 
+
   return (
     <section className="flex flex-col w-screen h-screen items-center justify-center">
 
