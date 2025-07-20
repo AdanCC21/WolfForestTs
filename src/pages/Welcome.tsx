@@ -1,41 +1,21 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom"
 
 export default function Welcome() {
     const navigator = useNavigate();
-    const [showIntro, setShowIntro] = useState(true);
+    // const [showIntro, setShowIntro] = useState(true);
 
-    useEffect(() => {
-        const timer = setTimeout(() => setShowIntro(false), 1500);
-        return () => clearTimeout(timer);
-    }, []);
+    // useEffect(() => {
+    //     const timer = setTimeout(() => setShowIntro(false), 1500);
+    //     return () => clearTimeout(timer);
+    // }, []);
 
     const [showAlert, setShowAlert] = useState(true);
-
-
 
     return (
         <div className="w-screen h-screen overflow-x-hidden bg-default">
             <AnimatePresence mode="wait">
-                {showIntro && (
-                    <motion.div
-                        key="intro"
-                        className="w-screen h-screen max-w-screen max-h-screen 
-                        flex flex-col justify-center items-center overflow-y-hidden">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.6, delay: 0.3 }}
-                            className="w-fit h-fit flex flex-col items-center justify-center overflow-hidden"
-                        >
-                            <img src="/logo.png" alt="logo" className="w-40 aspect-square object-cover mb-4" />
-                            <h1 className="text-4xl font-bold">Wolf Forest</h1>
-                        </motion.div>
-                    </motion.div>
-                )}
-
                 {showAlert && (
                     <motion.div
                         key="alert"
