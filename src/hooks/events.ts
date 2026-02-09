@@ -1,11 +1,11 @@
 import { Player } from "../entities/player.entity";
 import { CommonEvent, EventMessage, eventType, GenericEvent, SpecialEvent } from "../entities/events.entity";
-import { deathMessagesDay, deathMessagesNight } from "../data/deathMessages";
-import { farmArrowMessages, farmAxeMessages, farmPistolMessages, farmRazorMessages, farmRifleMessages, negativeCommonEventsDay, negativeCommonEventsNight, neutralCommonEventsDay, neutralCommonEventsNight, positiveCommonEventsDay, positiveCommonEventsNight } from "../data/farmMessages";
+import { deathMessagesDay, deathMessagesNight } from "../constants/deathMessages";
+import { farmArrowMessages, farmAxeMessages, farmPistolMessages, farmRazorMessages, farmRifleMessages, negativeCommonEventsDay, negativeCommonEventsNight, neutralCommonEventsDay, neutralCommonEventsNight, positiveCommonEventsDay, positiveCommonEventsNight } from "../constants/farmMessages";
 import { Arco, Hacha, Navaja, Pistola, Rifle } from "../entities/weapon.entity";
-import { DuoMessagesList, RelationMessagesList } from "../data/friendRelationMessages";
-import { ReviveMessageList } from "../data/healReviveMessages";
-import { KillMessageList } from "../data/killMessages";
+import { DuoMessagesList, RelationMessagesList } from "../constants/friendRelationMessages";
+import { ReviveMessageList } from "../constants/healReviveMessages";
+import { KillMessageList } from "../constants/killMessages";
 function randomNumber(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }

@@ -4,12 +4,6 @@ import { useNavigate } from "react-router-dom"
 
 export default function Welcome() {
     const navigator = useNavigate();
-    // const [showIntro, setShowIntro] = useState(true);
-
-    // useEffect(() => {
-    //     const timer = setTimeout(() => setShowIntro(false), 1500);
-    //     return () => clearTimeout(timer);
-    // }, []);
 
     const [showAlert, setShowAlert] = useState(true);
 
