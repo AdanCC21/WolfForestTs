@@ -113,7 +113,7 @@ export default function Game() {
             />
           ) : (
             <>
-              <p>No hay eventos especiales</p>
+              <h2>No hay eventos especiales</h2>
               <button onClick={() => {
                 // actualizar jugadores
                 let playerList: Array<Player> =
@@ -153,16 +153,19 @@ export default function Game() {
     if (playersInGame.length <= 1) {
       if (playersInGame.length === 1) {
         return (
-          <section>
-            <h1>Ganador</h1>
+          <section className="flex flex-col w-screen h-screen">
+            <h1 className="text-4xl">Ganador</h1>
             <SummaryCard player={playersInGame[0]} />
           </section>
         )
       }
       else {
         return (
-          <section>
-            <h1>Todos los jugadores murieron</h1>
+          <section className="flex flex-col h-screen w-screen items-center justify-center">
+            <h1 className="text-4xl font-bold">Todos los jugadores murieron</h1>
+            <button onClick={() => { navigator("/set") }} className="cursor-pointer">
+              <span className="text-base">Terminar</span>
+            </button>
           </section>
         )
       }

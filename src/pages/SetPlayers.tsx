@@ -3,6 +3,7 @@ import { newPlayer } from "../entities/player.entity";
 import { useNavigate } from "react-router-dom";
 import { useValidatePlayers } from "../hooks/validate";
 import { response } from "../entities/result.entity";
+import toast from "react-hot-toast";
 
 export default function SetPlayers() {
     const [players, setPlayers] = useState<Array<newPlayer>>([{ id: 1, image: 'https://media1.tenor.com/m/DbkOnZvFb6MAAAAd/glorp-outer-space.gif', name: 'Player 1' }]);
@@ -21,7 +22,20 @@ export default function SetPlayers() {
         setPlayers(prev => { return [...prev, temp] });
     }
 
+    const removePlayer = (index: number) => {
+        if (players.length > 1) {
+            let playersList = players.filter((_, ind) => ind !== index)
+            setPlayers(playersList);
+        } else {
+            toast.error("You need 1 player on your list");
+        }
+    }
+
     const play = () => {
+        if (players.length <= 1) {
+            toast.error("You need more than 1 player. Please add more players");
+            return;
+        }
         let playersOk: response = useValidatePlayers(players);
         if (playersOk.result) {
             sessionStorage.setItem('players', JSON.stringify(players));
@@ -54,14 +68,15 @@ export default function SetPlayers() {
                 <p>Players Number :</p>
                 <h2 className="text-green-500">{players.length}</h2>
                 <span>{alert}</span>
+                <button className="my-auto mx-auto size-fit" onClick={() => { addPlayer() }}>+ Add Player</button>
             </header>
 
             <main className="flex flex-col w-screen items-center">
                 <section className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5 w-8/10 my-3">
-                    {players.map((current) => (
+                    {players.map((current, index: number) => (
                         <article key={current.id} className="flex flex-col">
                             <div className="relative w-full">
-                                <button className="absolute right-[-20px] bg-[#272727] rounded-full">
+                                <button onClick={() => { removePlayer(index) }} className="absolute right-[-20px] bg-[#272727] rounded-full">
                                     x
                                 </button>
                                 <img className="rounded-md mx-auto my-2" src={current.image || 'w'} alt={current.name} />
@@ -76,10 +91,11 @@ export default function SetPlayers() {
                             </div>
                         </article>
                     ))}
-                    <button className="my-auto mx-auto size-fit" onClick={() => { addPlayer() }}>+ Add Player</button>
                 </section>
 
-                <button className="w-fit" onClick={() => { play() }}>Jugar</button>
+                <button className={`${players.length <= 1 ? "text-[#ccc] cursor-not-allowed" : "text-white"} w-fit`} onClick={() => { play() }}>
+                    Jugar
+                </button>
             </main>
 
             <footer className="flex flex-col items-center justify-end w-screen min-h-[10vh]">

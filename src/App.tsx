@@ -3,11 +3,13 @@ import Welcome from './pages/Welcome'
 import SetPlayers from './pages/SetPlayers'
 import Game from './pages/Game'
 import GenericError from './pages/errors/GenericError'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
 
   return (
     <BrowserRouter>
+      <Toaster position='top-right' />
       <Routes>
         <Route path='/' Component={Welcome} />
         <Route path='/set' Component={SetPlayers} />
@@ -19,4 +21,3 @@ function App() {
 }
 
 export default App
-  

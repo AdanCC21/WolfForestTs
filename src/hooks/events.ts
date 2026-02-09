@@ -332,7 +332,6 @@ function killPlayer(playerBase: Player, playersList: Player[]): GenericEvent {
         }
         return { isCommon: false, event: specialEvent, playerOrigin: playerBase }
     }
-
 }
 
 function linkPlayers(playerBase: Player, playersList: Player[], isDuo: boolean, isDay: boolean): GenericEvent {
